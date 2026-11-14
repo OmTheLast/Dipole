@@ -48,3 +48,11 @@ The SHA-256 of the compressed NASA file for this chart is `f7788db9044d0f0e3f956
 The second script reads the packed temperature values with a separate NetCDF reader, calculates the area of each latitude band from its edges, and checks the exported means and slopes. A known rise of 0.30°C per decade checks the time and unit conversion.
 
 [Annual data and coverage](../results/annual-temperatures.csv) · [Trend estimates and confidence intervals](../results/trends.csv)
+
+## Explore a grid cell
+
+[Open the temperature map](https://omthelast.github.io/Dipole/). Click the map, move with the arrow keys, or enter coordinates. The marker and outlined box identify the selected cell. The Chennai preset selects the coastal grid cell containing the city. Each location covers two degrees in both latitude and longitude.
+
+Of 16,200 cells, 15,805 have all 46 complete calendar years. The map reports a rate for these cells using the same trend fit as the regional analysis. Multiplying the rate and its interval by 4.5 gives the **fitted** change over the 45 years between 1980 and 2025. These pointwise intervals describe the selected cell. The map color shows rate alone. At cells with gaps the chart and table show the available complete years.
+
+From the repository root, run `.venv/bin/python analysis/export_map.py` after reproducing the regional results. This writes the browser data to `docs/map/`. Run `.venv/bin/python analysis/check_map.py` to check them. Serve the site locally with `python3 -m http.server --directory docs`.

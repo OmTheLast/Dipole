@@ -1,6 +1,8 @@
 <h1 align="center">Dipole</h1>
 
-**Compare how quickly the Arctic and the ocean south of Greenland warmed from 1980 through 2025 using NASA’s surface temperature record.**
+**Pick a place on the world map to see its estimated surface temperature change from 1980 to 2025, its annual history, and the uncertainty in the trend.**
+
+[Open the temperature explorer](https://omthelast.github.io/Dipole/)
 
 ![Annual temperatures in the Arctic and the North Atlantic relative to their 1951–1980 averages](results/temperature.png)
 

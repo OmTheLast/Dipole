@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7f6f0">
+<title>Dipole · Temperature explorer</title>
+<link rel="stylesheet" href="map/style.css">
+<script src="map/app.js" defer></script>
+</head>
+<body>
+<header><div class="brand"><span class="brandmark" aria-hidden="true"></span>Dipole</div><nav aria-label="Project"><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources ↗</a><a href="https://github.com/OmTheLast/Dipole">GitHub ↗</a></nav></header>
+<main>
+<section class="intro"><div><p class="eyebrow">Earth System Trend Detective</p><h1>Temperature explorer</h1><p>Pick a place to see how its surface temperature changed.</p></div><span class="period">1980 — 2025</span></section>
+<p id="status" role="status">Loading NASA temperature estimates…</p>
+<div class="workspace">
+<section class="atlas" aria-label="Global temperature map">
+<div class="panelhead"><h2>World map</h2><span>2° × 2° grid</span></div>
+<div class="mapframe"><canvas id="map" tabindex="0" aria-label="World temperature trend map. Click to select a cell or move with arrow keys. You can also enter coordinates below."></canvas></div>
+<div class="legend"><span>Temperature trend <b>°C / decade</b></span><div class="scale"><div class="gradient"></div><div class="ticks"><span>≤ −1</span><span>0</span><span>≥ +1</span></div></div><span class="missing"><i></i> Incomplete record</span></div>
+<div class="locations"><h3>Explore a place</h3><div class="presets" id="presets">
+<button data-region="Arctic">Arctic region</button><button data-region="North Atlantic">North Atlantic region</button><button data-lat="13.08" data-lon="80.27">Chennai</button></div>
+<form id="coords"><label>Latitude<input type="number" name="lat" required min="-90" max="90" step="any" placeholder="−90 to 90"></label><label>Longitude<input type="number" name="lon" required min="-180" max="180" step="any" placeholder="−180 to 180"></label><button type="submit">Go to cell →</button></form></div>
+</section>
+<section class="inspector" aria-label="Selected location">
+<div class="panelhead"><h2>Location details</h2><span id="kind">Region</span></div>
+<div id="details" aria-live="polite"><h3 id="name">Arctic</h3><p id="bounds"></p><p class="metriclabel">Estimated change · 1980–2025</p><div id="change">…</div><p id="rate"></p><p id="interval"></p><p id="explain"></p></div>
+<div class="history"><h3>Annual temperature history</h3><div class="caption">°C above or below the 1951–1980 average</div><canvas id="plot" role="img" aria-label="Annual temperature anomaly chart"></canvas><details><summary>See annual values</summary><div class="tablebox"><table><thead><tr><th>Year</th><th>Anomaly (°C)</th></tr></thead><tbody id="annual"></tbody></table></div></details></div>
+</section></div>
+<details class="method"><summary>How to read the map and its uncertainty</summary><p>Each color represents a cell’s estimated rate, in °C per decade. We fit a straight line through 46 annual averages and multiply the rate by 4.5 decades to estimate the total change. Each year requires all 12 months. Gray cells have incomplete records.</p><p>The 95% interval describes uncertainty in the fitted trend for one selected place. It accounts for similar temperatures in nearby years using Newey–West standard errors with three annual lags. It excludes additional uncertainty in NASA’s temperature estimates. Testing many locations can produce chance findings. Map colors show the size of the trend.</p><p>Region buttons use area-weighted averages. Each map click selects a single 2° cell. NASA combines land air and open-ocean surface temperatures and estimates values between measurement sites.</p></details>
+<footer><span>Temperature estimates · <a href="https://data.giss.nasa.gov/gistemp/">NASA GISS / GISTEMP v4</a></span><span>Coastlines · <a href="https://www.naturalearthdata.com/">Natural Earth</a></span></footer>
+</main></body></html>

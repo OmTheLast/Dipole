@@ -1,12 +1,12 @@
 # Dipole submission sources
 
-Copy the **Link Text** and **Link URL** into the matching section of the submission form. The last column records what each source contributed. Current milestone: the Arctic and North Atlantic temperature chart, 14 November 2026.
+Copy the **Link Text** and **Link URL** into the matching section of the submission form. The last column records what each source contributed. Current milestone: the clickable global temperature map and two regional histories, 14 November 2026.
 
 ## NASA Data
 
 | Link Text | Link URL | How Dipole used it |
 | --- | --- | --- |
-| NASA GISS Surface Temperature Analysis (GISTEMP v4) | https://data.giss.nasa.gov/gistemp/ | Primary dataset. We used monthly surface temperature anomalies to calculate annual regional averages and warming rates for 1980–2025. Accessed 14 November 2026. |
+| NASA GISS Surface Temperature Analysis (GISTEMP v4) | https://data.giss.nasa.gov/gistemp/ | Primary dataset. We used monthly surface temperature anomalies to calculate annual regional and grid-cell averages and warming rates for 1980–2025. Accessed 14 November 2026. |
 | NASA GISTEMP v4 data downloads | https://data.giss.nasa.gov/gistemp/data_v4.html | Identifies the 2° Land–Ocean Temperature Index grid with 1,200 km smoothing. |
 | NASA GISTEMP v4 Land–Ocean Temperature Index, monthly NetCDF file | https://data.giss.nasa.gov/pub/gistemp/gistemp1200_GHCNv4_ERSSTv5.nc.gz | The file used for the chart. NASA generated this snapshot on 10 November 2026. The link updates as NASA revises the data. |
 | NASA GISTEMP frequently asked questions | https://data.giss.nasa.gov/gistemp/faq/ | Explains the reference period, how NASA combines land and ocean measurements, and how it estimates values between observations. |
@@ -20,6 +20,7 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 | Rantanen et al. (2022), The Arctic has warmed nearly four times faster than the globe since 1979 | https://doi.org/10.1038/s43247-022-00498-3 | Research precedent for the Arctic boundary. Dipole calculated its own rate against a different comparison region. |
 | Allan et al., Seasonal Changes in the North Atlantic Cold Anomaly | https://doi.org/10.1029/2019JC015379 | Scientific context for investigating surface temperatures south of Greenland. |
 | Molodtsov et al., North Atlantic temperature and salinity changes | https://doi.org/10.1038/s41612-025-01210-w | Background for studying the subpolar latitude band. Dipole selected its own longitude limits. |
+| Natural Earth, 1:110m land polygons | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_110m_land.geojson | Public-domain coastline geometry used to orient visitors on the clickable world map. Retrieved 14 November 2026. |
 | Python | https://www.python.org/ | Ran the analysis and verification scripts. |
 | Unidata netCDF4 for Python | https://unidata.github.io/netcdf4-python/ | Read NASA’s monthly grid, dates and missing values. |
 | NumPy | https://numpy.org/ | Calculated area-weighted regional averages and annual differences. |
