@@ -67,5 +67,16 @@ To rebuild the explorer, download the NASA global table in addition to the grid 
 curl -fL --retry 2 'https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv' -o raw/global.csv
 .venv/bin/python analysis/export_map.py
 .venv/bin/python analysis/check_map.py
+.venv/bin/python analysis/station_coverage.py
+.venv/bin/python analysis/check_coverage.py
 python3 -m http.server 8765 --bind 127.0.0.1 --directory docs
+```
+
+### Hatched cells
+
+NASA's standard grid fills cells from stations up to 1,200 km away. The map hatches land cells where NASA's 250 km grid has data in fewer than half the months of the selected period: 850 of 5,392 land cells for 1980–2025 and 1,049 for 1900–2025. A cell counts as land when its centre lies inside the Natural Earth outline. Ocean cells are not hatched. The saved monthly coverage is in `analysis/station_support_250km.json`, and `check_coverage.py` confirms the map files match it. To recompute it, download the 250 km grid to `raw/gistemp250.nc` before running `station_coverage.py`:
+
+```sh
+curl -fL -o raw/gistemp250.nc.gz https://data.giss.nasa.gov/pub/gistemp/gistemp250_GHCNv4.nc.gz
+gzip -dc raw/gistemp250.nc.gz > raw/gistemp250.nc
 ```
