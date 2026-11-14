@@ -80,3 +80,18 @@ NASA's standard grid fills cells from stations up to 1,200 km away. The map hatc
 curl -fL -o raw/gistemp250.nc.gz https://data.giss.nasa.gov/pub/gistemp/gistemp250_GHCNv4.nc.gz
 gzip -dc raw/gistemp250.nc.gz > raw/gistemp250.nc
 ```
+
+### 2020 population in faster-warming cells
+
+The count sums the estimated 2020 residents in 2° cells whose fitted local-minus-global slope is positive. The denominator includes all residents in cells with a complete temperature trend for the selected period. A separate count uses only cells whose pointwise 95% lower bound exceeds zero. Short records can give overly narrow intervals. Counts are estimates of residential exposure to a regional trend.
+
+We add the GHS-POP 30 arc-second pixel counts by pixel centre, wrapping longitudes at the dateline. For India we apply the Natural Earth v5.1.2 country boundary at the population raster’s resolution before summing. Border counts depend on that boundary. The browser displays rounded results. The calculation uses unrounded population weights.
+
+From the repository root, install the analysis requirements, then rebuild with the following commands.
+
+```sh
+curl -fL --retry 2 -o raw/pop2020.zip https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_4326_30ss/V1-0/GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0.zip
+unzip -o raw/pop2020.zip '*.tif' -d raw
+curl -fL --retry 2 -o raw/ne_10m_admin_0_countries_ind.geojson https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson
+.venv/bin/python analysis/population.py
+```

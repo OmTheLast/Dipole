@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northwest India water storage · Dipole</title>
+<link rel="stylesheet" href="../map/style.css?v=population-1"><link rel="stylesheet" href="water.css"><script src="water.js" defer></script></head>
+<body><header><div class="brand"><span class="brandmark" aria-hidden="true"></span>Dipole</div><nav><a href="../">Temperature explorer</a></nav></header>
+<main><section class="intro"><div><p class="eyebrow">Northwest India · GRACE and GRACE-FO</p>
+<h1>Water after the monsoon</h1><p>How much water did Rajasthan, Punjab, Haryana and Delhi store after each rainy season?</p></div></section>
+<section class="atlas waterPanel"><h2>Regional water storage</h2>
+<p>Zero is the region’s average storage in 2004–2009. A value of −10 cm means the region held less water than that average, equivalent to a 10 cm layer spread across its area.</p>
+<p id="waterStatus" role="status">Loading NASA observations…</p>
+<div id="waterData" hidden>
+<div class="waterControls"><label>Chart view <select id="waterView"><option value="post-monsoon">After each monsoon</option><option value="monthly">All observed months</option></select></label>
+<label>Inspect a monsoon <select id="waterYear"></select></label></div>
+<div id="waterReading" aria-live="polite"></div>
+<figure><img id="waterChart" src="post-monsoon.svg" alt="October and November average water storage by year, with a fitted trend. Exact values follow in the table."><figcaption id="waterLegend"></figcaption></figure>
+<p id="waterTrend"></p>
+<details><summary>See every post-monsoon estimate</summary><div class="scrolltable"><table><thead><tr><th>Year</th><th>October (cm)</th><th>November (cm)</th><th>Mean (cm)</th></tr></thead><tbody id="waterRows"></tbody></table></div></details>
+<details><summary>How to read the data and uncertainty</summary>
+<p>GRACE senses changes in total water stored in groundwater, soil, surface water and snow. Recovering an absolute volume or isolating groundwater would require extra information. The monthly series starts in April 2002. Missing months appear as gaps, including the break between satellite missions.</p>
+<p>Each post-monsoon point averages October and November equally and requires both observations. Comparing the same months each year controls for the usual seasonal cycle. The line fits only complete seasons and accounts for correlation across calendar years. Its approximate 95% interval describes uncertainty in that fitted slope. It excludes additional uncertainty from satellite measurements and the regional boundary.</p>
+<p id="waterSensitivity"></p><p>The interval treats the estimated correlation as fixed. The estimate reached the model’s upper limit of 0.95, which makes the interval particularly sensitive to that choice.</p><p>The regional mean weights each grid square by the area inside the four boundaries. The 0.5° grid represents broader measurements at about 3° resolution. We used the JPL coastal-filtered product without optional gain factors.</p>
+</details><p class="waterLinks"><a href="monthly.csv" download>Download monthly observations (CSV)</a> · <a href="https://podaac.jpl.nasa.gov/dataset/TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4">NASA/JPL source data</a></p></div></section></main></body></html>

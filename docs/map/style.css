@@ -32,3 +32,27 @@
 #sparse {font-size:13px; margin-top:6px; color:var(--muted)}
 .note {font-size:12px; color:var(--muted); margin-top:8px; max-width:90ch}
 .shortfit th, .shortfit td {color:var(--muted)}
+
+.maptools {display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:0 4px 10px}
+.maptools button {min-width:34px; min-height:34px}
+.maptools button:disabled {opacity:.46; cursor:default}
+#zoomLevel {min-width:3ch; text-align:center; font-variant-numeric:tabular-nums}
+#mapHint {font-size:12px; color:var(--muted); margin-left:4px}
+.maparea {position:relative}
+#map.zoomed {cursor:grab; touch-action:none}
+#map.dragging {cursor:grabbing}
+#cellTip {position:absolute; pointer-events:none; max-width:100%; background:#183c35; color:white; border-radius:5px; padding:6px 9px; font:12px/1.45 system-ui,sans-serif; white-space:pre-line; box-shadow:0 2px 6px #0003}
+
+#exposureCaption, #population details p {color:var(--muted); margin-top:6px; font-size:14px}
+#population table {width:100%; min-width:540px; table-layout:fixed}
+#population th {white-space:normal; vertical-align:bottom; line-height:1.35}
+#population thead th:first-child {width:10%}
+#population tr > :nth-child(2) {text-align:right}
+#population tbody td {font-variant-numeric:tabular-nums}
+#population details {margin-top:12px; max-width:85ch}
+
+.populationBar {max-width:52em; margin:16px 0}
+.populationBar figcaption {font-size:13px}
+.populationTrack {height:10px; margin:6px 0; border-radius:5px; overflow:hidden; background:#739aaa}
+.populationTrack span {display:block; height:100%; background:#c17151}
+.populationLabels {display:flex; justify-content:space-between; gap:8px; font-size:12px; color:var(--muted)}

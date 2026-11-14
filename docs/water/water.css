@@ -1,0 +1,13 @@
+main {max-width:980px; margin-bottom:40px}
+.waterPanel {padding:clamp(14px,3vw,32px)}
+.waterPanel p {margin:10px 0; max-width:86ch}
+.waterControls {display:flex; flex-wrap:wrap; gap:12px 24px; margin:19px 0}
+.waterControls label {display:grid; gap:3px; color:var(--muted); font-size:13px}
+.waterControls select {font:inherit; color:var(--green); background:white; padding:7px 10px; border:1px solid var(--border); border-radius:4px}
+#waterReading {border-left:3px solid #245c65; padding:8px 12px; background:#f1f4ed}
+figure {margin:16px 0} figure img {display:block; width:100%; height:auto}
+figcaption, .waterLinks {color:var(--muted); font-size:13px}
+.waterPanel details {margin:14px 0}
+.waterPanel table {border-collapse:collapse; width:auto}
+.waterPanel th,.waterPanel td {padding:4px 12px; text-align:right; border-bottom:1px solid var(--border)}
+@media(max-width:550px){.waterPanel th,.waterPanel td {padding:4px} figure {margin-inline:-9px}}
