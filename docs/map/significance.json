@@ -1,0 +1,38 @@
+{
+ "q": 0.05,
+ "test": "Benjamini\u2013Hochberg over all complete cells",
+ "periods": {
+  "1980": {
+   "local": {
+    "cells": 15805,
+    "raw_p_below_0.05": 12279,
+    "fdr_discoveries": 12118,
+    "largest_passing_p": 0.0383303299063098
+   },
+   "relative": {
+    "cells": 15805,
+    "raw_p_below_0.05": 9690,
+    "fdr_discoveries": 8919,
+    "largest_passing_p": 0.028211708491801636
+   },
+   "sparse_land_cells": 850,
+   "land_cells": 5392
+  },
+  "1900": {
+   "local": {
+    "cells": 11794,
+    "raw_p_below_0.05": 11531,
+    "fdr_discoveries": 11527,
+    "largest_passing_p": 0.048625472060819915
+   },
+   "relative": {
+    "cells": 11794,
+    "raw_p_below_0.05": 6538,
+    "fdr_discoveries": 5856,
+    "largest_passing_p": 0.02474256301507179
+   },
+   "sparse_land_cells": 1049,
+   "land_cells": 5392
+  }
+ }
+}

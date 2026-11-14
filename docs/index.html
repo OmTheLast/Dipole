@@ -5,17 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f7f6f0">
 <title>Dipole · Temperature explorer</title>
-<link rel="stylesheet" href="map/style.css?v=b77b1a4183">
-<script src="map/app.js?v=c7868b25ba" defer></script>
+<link rel="stylesheet" href="map/style.css?v=fdr-cases-1">
+<script src="map/app.js?v=fdr-cases-1" defer></script>
 </head>
 <body>
 <header><div class="brand"><span class="brandmark" aria-hidden="true"></span>Dipole</div><nav aria-label="Project"><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources ↗</a><a href="https://github.com/OmTheLast/Dipole">GitHub ↗</a></nav></header>
 <main>
 <section class="intro"><div><p class="eyebrow">Earth System Trend Detective</p><h1>Temperature explorer</h1><p>Pick a place to see how its surface temperature changed.</p></div></section>
+<fieldset id="cases" class="cases" disabled><legend>Start with a finding</legend><button data-case="hole" aria-pressed="true">The warming hole</button> <button data-case="arctic" aria-pressed="false">Arctic amplification</button> <button data-case="recent" aria-pressed="false">Is amplification new?</button></fieldset>
+<p id="story" class="story"></p>
 <div class="controls">
 <fieldset id="views" disabled><legend>Explore</legend><button data-view="trend" aria-pressed="true">Trend</button> <button data-view="annual" aria-pressed="false">By year</button></fieldset>
-<fieldset id="periods" disabled><legend>Time period</legend><button data-start="1900" aria-pressed="false">1900–2025</button> <button data-start="1980" aria-pressed="true">1980–2025</button></fieldset>
-<fieldset id="modes" disabled><legend>Map colors</legend><button data-mode="absolute" aria-pressed="true">Local trend</button> <button data-mode="relative" aria-pressed="false">Relative to global</button></fieldset>
+<fieldset id="periods" disabled><legend>Time period</legend><button data-start="1900" aria-pressed="true">1900–2025</button> <button data-start="1980" aria-pressed="false">1980–2025</button></fieldset>
+<fieldset id="modes" disabled><legend>Map colors</legend><button data-mode="absolute" aria-pressed="false">Local trend</button> <button data-mode="relative" aria-pressed="true">Relative to global</button></fieldset>
 </div>
 <div id="scrubber" hidden><label for="year">Year <output id="yearValue" for="year">2015</output></label>
 <div class="yeartrack"><span id="startLabel">1980</span><input id="year" type="range" min="1980" max="2025" step="1" value="2015"><span>2025</span></div></div>
@@ -24,20 +26,23 @@
 <section class="atlas" aria-label="Global temperature map">
 <div class="panelhead"><h2>World map</h2><span>2° × 2° grid</span></div>
 <div class="mapframe"><canvas id="map" tabindex="0" aria-label="World temperature trend map. Click to select a cell or move with arrow keys. You can also enter coordinates below."></canvas></div>
-<div class="legend"><span><span id="legendText">Temperature trend</span> <b id="legendUnits">°C / decade</b></span><div class="scale"><div class="gradient"></div><div class="ticks"><span id="scaleLow">≤ −1</span><span>0</span><span id="scaleHigh">≥ +1</span></div></div><span class="missing"><i></i> <span id="missingLabel">Incomplete record</span></span></div>
+<div class="legend"><span><span id="legendText">Temperature trend</span> <b id="legendUnits">°C / decade</b></span><div class="scale"><div class="gradient"></div><div class="ticks"><span id="scaleLow">≤ −1</span><span>0</span><span id="scaleHigh">≥ +1</span></div></div><span class="missing"><i></i> <span id="missingLabel">Incomplete record</span></span><span id="overlayKey" class="overlaykey"><span class="dotkey"><i></i> Not significant after map-wide FDR test</span><span class="hatchkey"><i></i> Mostly interpolated: no station within 250 km</span></span></div>
 <div class="locations"><h3>Explore a place</h3><div class="presets" id="presets">
 <button data-region="Arctic">Arctic region</button><button data-region="North Atlantic">North Atlantic region</button><button data-lat="13.08" data-lon="80.27">Cell near Chennai</button></div>
 <form id="coords"><label>Latitude<input type="number" name="lat" required min="-90" max="90" step="any" placeholder="−90 to 90"></label><label>Longitude<input type="number" name="lon" required min="-180" max="180" step="any" placeholder="−180 to 180"></label><button type="submit">Go to cell →</button></form></div>
 </section>
 <section class="inspector" aria-label="Selected location">
 <div class="panelhead"><h2>Location details</h2><span id="kind">Region</span></div>
-<div id="details" aria-live="polite"><h3 id="name">Arctic</h3><p id="bounds"></p><p id="coverage"></p><p class="metriclabel" id="metricLabel">Estimated change</p><div id="change">…</div><p id="rate"></p><p id="reference"></p><p id="interval"></p><p id="explain"></p></div>
+<div id="details" aria-live="polite"><h3 id="name">Arctic</h3><p id="bounds"></p><p id="coverage"></p><p class="metriclabel" id="metricLabel">Estimated change</p><div id="change">…</div><p id="rate"></p><p id="reference"></p><p id="interval"></p><p id="explain"></p><p id="robust"></p><p id="sparse"></p></div>
 <div class="history"><h3>Annual temperature history</h3><div class="caption">°C above or below the 1951–1980 average</div><div class="chartkey"><span>Local</span><span>Global</span><span id="fitKey">Local fitted trend</span></div><canvas id="plot" role="img" aria-label="Annual temperature anomaly chart"></canvas><details><summary>See annual values</summary><div class="tablebox"><table><thead><tr><th>Year</th><th>Local (°C)</th><th>Global (°C)</th></tr></thead><tbody id="annual"></tbody></table></div></details></div>
 </section></div>
-<section class="summary atlas"><h2>Regional comparison</h2><p id="comparisonCaption"></p><div class="scrolltable"><table><thead><tr><th scope="col">Region</th><th scope="col" id="timeHeading">Years fitted</th><th scope="col">Local</th><th scope="col">Global</th><th scope="col">Local − global</th></tr></thead><tbody id="comparison"></tbody></table></div></section>
+<section class="summary atlas"><h2>Regional comparison</h2><p id="comparisonCaption"></p><div class="scrolltable"><table><thead><tr><th scope="col">Region</th><th scope="col" id="timeHeading">Years fitted</th><th scope="col">Local</th><th scope="col">Global</th><th scope="col">Local − global</th></tr></thead><tbody id="comparison"></tbody></table></div><p id="comparisonNote" class="note"></p></section>
 <details class="method"><summary>How to read the trends and uncertainty</summary>
 <p>Each trend is the slope of a straight line through annual temperatures relative to the 1951–1980 average. For the global comparison we fit the yearly local minus global differences. A negative difference means a place warmed more slowly than the world or cooled more quickly. The chart shows the two original histories.</p>
 <p>In the yearly view, each cell needs all 12 months in the selected year. For a trend it needs all 12 months in every year of the period. Gray marks missing estimates. Regional averages weight cells by area and require at least 80% coverage each month. If a region has gaps, its fitted line uses the uninterrupted record after the last gap. Its global comparison uses exactly those years.</p>
-<p>The 95% interval describes the fitted trend for the selected place. We account for similarities between nearby years using Newey–West standard errors with three annual lags. The interval excludes additional uncertainty in NASA’s temperature estimates. Map colors show estimated rates. Examining many locations can produce chance findings.</p></details>
+<p>The 95% interval describes the fitted trend for the selected place. We account for similarities between nearby years using Newey–West standard errors with three annual lags. The interval excludes additional uncertainty in NASA’s temperature estimates. Map colors show estimated rates.</p>
+<p><b>Testing thousands of cells at once.</b> At p &lt; 0.05, about one cell in twenty would look significant by chance. We convert each cell’s interval to a p-value and apply the Benjamini–Hochberg false discovery rate test at q = 0.05 across all complete cells, separately for each period and for local and relative trends. Cells that do not pass carry a dot. A selected cell reports whether it passed. Regions are single tests and are not part of this step.</p>
+<p><b>How optimistic are single-cell intervals?</b> In simulations of 46 trendless years with year-to-year correlation of 0.3, about 14% of Newey–West tests fell below p = 0.05 instead of 5%. The map-wide test removes most of these chance flags, but treat any single cell’s interval as somewhat too narrow.</p>
+<p><b>Where the map is interpolated.</b> NASA’s standard grid fills each cell from stations up to 1,200 km away. Hatched land cells are where NASA’s 250 km analysis has data in fewer than half of the period’s months, so the colour there mostly reflects distant stations. Ocean cells use sea surface temperatures and are not hatched. Land is the Natural Earth outline at each cell’s centre.</p></details>
 <footer><span>Temperature estimates · <a href="https://data.giss.nasa.gov/gistemp/">NASA GISS / GISTEMP v4</a></span><span>Coastlines · <a href="https://www.naturalearthdata.com/">Natural Earth</a></span></footer>
 </main></body></html>

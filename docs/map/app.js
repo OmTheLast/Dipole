@@ -4,12 +4,47 @@ const $ = id => document.getElementById(id);
 const map = $("map");
 const plot = $("plot");
 const cols = 180, rows = 90;
-let firstYear = 1980, years, stride, mode = "absolute", periods, period, land;
+// The page opens on the warming-hole finding: 1900–2025, relative to global, North Atlantic.
+let firstYear = 1900, years, stride, mode = "relative", periods, period, land;
 let byYear = false, selectedYear = 2015, scrubFrame;
 let fitLine, requestedYear = firstYear;
+let activeCase = "hole";
 const files = new Map();
 const colors = [[33,89,129], [141,188,203], [243,238,219], [228,154,99], [164,57,47]];
-let cells, regions, base, selected, series, selectedBounds;
+let cells, flags, regions, base, selected, series, selectedBounds;
+// Colour limits (°C/decade) chosen per view so that roughly the largest 2% of cells saturate.
+// One fixed ±1 scale washed out the long-period differences, which are about ±0.1.
+const limits = {absolute: {1980: 1, 1900: 0.3}, relative: {1980: 0.6, 1900: 0.15}};
+const FDR_Q = 0.05;
+const cases = {
+  hole: {start: 1900, mode: "relative", region: "North Atlantic"},
+  arctic: {start: 1980, mode: "relative", region: "Arctic"},
+  recent: {start: 1900, mode: "relative", region: "Arctic"},
+};
+const fmt = (n, digits = 2) => (n < 0 ? "−" : "+") + Math.abs(n).toFixed(digits);
+function storyText(name) {
+  const r80 = periods[1980].regions, r00 = periods[1900].regions;
+  const range = r => fmt(r.relative[1]) + " to " + fmt(r.relative[2]);
+  if (name === "hole") {
+    const na = r00["North Atlantic"], na80 = r80["North Atlantic"];
+    return "The warming hole. Since 1900 the ocean south of Greenland warmed " + fmt(na.stats[0]) +
+      " °C/decade while the world warmed " + fmt(na.globalRate) + ". That puts it " + fmt(na.relative[0]) +
+      " °C/decade relative to the globe (95% interval " + range(na) + "). The ten most below-global cells on the 1900–2025 map all sit in this box. " +
+      "Over 1980–2025 the same box is " + fmt(na80.relative[0]) + " (interval " + range(na80) +
+      "), so the hole is a long-run feature that a 45-year window cannot resolve.";
+  }
+  if (name === "arctic") {
+    const a = r80.Arctic;
+    return "Arctic amplification. Since 1980 the Arctic warmed " + fmt(a.stats[0]) + " °C/decade, " +
+      (a.stats[0] / a.globalRate).toFixed(1) + "× the global " + fmt(a.globalRate) + ". The gap is " +
+      fmt(a.relative[0]) + " °C/decade (95% interval " + range(a) + "). Same planet, same years, very different rates.";
+  }
+  const a = r00.Arctic, a80 = r80.Arctic;
+  return "Is amplification new? Fitted over " + a.fitStart + "–2025 (the Arctic record has a gap in " + (a.fitStart - 1) +
+    "), the Arctic runs only " + fmt(a.relative[0]) + " °C/decade above the globe (interval " + range(a) + "), against " +
+    fmt(a80.relative[0]) + " since 1980. The chart shows why: a warm Arctic spell in the 1930s–40s flattens the long-run line. " +
+    "Most of the excess Arctic warming is recent.";
+}
 const changeText = n => (n < 0 ? "−" : "+") + Math.abs(n).toFixed(2);
 const latText = v => Math.abs(v) + "°" + (v > 0 ? "N" : v < 0 ? "S" : "");
 const lonText = v => Math.abs(v) + "°" + (v > 0 ? "E" : v < 0 ? "W" : "");
@@ -35,7 +70,7 @@ function makeMap(land) {
     base.height = 720;
     coastlines = coastlineLayer(land);
   }
-  const limit = byYear ? 3 : 1;
+  const limit = byYear ? 3 : limits[mode][firstYear];
   const field = byYear ? 6 + selectedYear - firstYear : (mode === "relative" ? 3 : 0);
   for (let r=0; r<rows; r++) {
     for (let c=0; c<cols; c++) {
@@ -50,7 +85,25 @@ function makeMap(land) {
   const ctx = base.getContext("2d");
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(gridImage, 0, 0, base.width, base.height);
+  if (!byYear && flags) drawOverlays(ctx, field);
   ctx.drawImage(coastlines, 0, 0);
+}
+// Dots: complete cells whose trend does not survive the map-wide false discovery rate test.
+// Hatching: land cells where NASA has a station within 250 km in fewer than half the months.
+function drawOverlays(ctx, field) {
+  const size = base.width / cols, bit = field === 3 ? 2 : 1;
+  ctx.fillStyle = "rgba(24,36,33,.62)";
+  ctx.strokeStyle = "rgba(24,36,33,.5)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const id = r*cols + c, x = c*size, y = (rows-1-r)*size;
+      if (Number.isFinite(cells[id*stride]) && !(flags[id] & bit)) ctx.fillRect(x + size/2 - 1.25, y + size/2 - 1.25, 2.5, 2.5);
+      if ((flags[id] & 4) && Number.isFinite(cells[id*stride])) { ctx.moveTo(x, y + size); ctx.lineTo(x + size, y); }
+    }
+  }
+  ctx.stroke();
 }
 function coastlineLayer(land) {
   const layer = document.createElement("canvas");
@@ -148,6 +201,11 @@ function drawSeries(values) {
 function show(selection) {
   if (!cells) return;
   selected = selection;
+  if (activeCase && selection.region !== cases[activeCase].region) {
+    activeCase = null;
+    for (const button of $("cases").querySelectorAll("button")) button.setAttribute("aria-pressed", "false");
+    $("story").hidden = true;
+  }
   let stats, relative, bounds, name, fitStart = firstYear, globalRate = period.stats[0];
   if (selection.region) {
     ({stats, relative, bounds, series, fitStart, globalRate} = regions[selection.region]); name=selection.region;
@@ -172,7 +230,7 @@ function show(selection) {
     fitLine = null;
     showAnnualDetails();
   } else {
-    showTrendDetails(stats, relative, fitStart, globalRate);
+    showTrendDetails(stats, relative, fitStart, globalRate, selection.cell);
   }
   for (const button of $("presets").querySelectorAll("button")) {
     button.setAttribute("aria-pressed",String(button.dataset.region ? selection.region===button.dataset.region :
@@ -199,8 +257,10 @@ function showAnnualDetails() {
   $("reference").textContent = "Global anomaly: " + changeText(period.series[i]) + " °C";
   $("interval").textContent = "";
   $("explain").textContent = available ? "" : "Too little coverage for an annual estimate here.";
+  $("robust").textContent = "";
+  $("sparse").textContent = "";
 }
-function showTrendDetails(stats, relative, fitStart, globalRate) {
+function showTrendDetails(stats, relative, fitStart, globalRate, cell) {
   const showGap = mode === "relative";
   const [rate, low, high] = (showGap ? relative : stats) || [];
   const valid = Number.isFinite(rate);
@@ -226,6 +286,11 @@ function showTrendDetails(stats, relative, fitStart, globalRate) {
       high < 0 ? "The interval supports cooling here." : "The interval includes zero. The direction is uncertain.";
   }
   $("explain").textContent = interpretation;
+  $("robust").textContent = cell === undefined || !valid ? "" :
+    (flags[cell] & (showGap ? 2 : 1)) ? "Map-wide check: passes the false discovery rate test (q = " + FDR_Q + ") across all " + "complete cells." :
+    "Map-wide check: does not pass the false discovery rate test (q = " + FDR_Q + "). Treat this cell's result as uncertain.";
+  $("sparse").textContent = cell !== undefined && (flags[cell] & 4) ?
+    "Few nearby stations: NASA has a station within 250 km here in fewer than half the months, so this value is mostly interpolated from distant stations." : "";
   fitLine = null;
   if (valid) {
     const offset = fitStart - firstYear;
@@ -255,6 +320,16 @@ map.addEventListener("keydown",e=>{
   c+=Number(e.key==="ArrowRight")-Number(e.key==="ArrowLeft");
   show({cell:clamp(r,0,rows-1)*cols+(c+cols)%cols});
 });
+$("cases").addEventListener("click", event => {
+  const button = event.target.closest("button");
+  if (!button || !cells) return;
+  const story = cases[button.dataset.case];
+  activeCase = button.dataset.case;
+  byYear = false;
+  mode = story.mode;
+  selected = {region: story.region};
+  if (story.start === firstYear) render(); else selectPeriod(story.start);
+});
 $("presets").addEventListener("click",e=>{
   const b=e.target.closest("button"); if (!b) return;
   show(b.dataset.region ? {region:b.dataset.region} : {cell:cellAt(+b.dataset.lat,+b.dataset.lon)});
@@ -273,6 +348,12 @@ async function get(file) {
 
 function regionalTable() {
   $("timeHeading").textContent = byYear ? "Year" : "Years fitted";
+  const starts = Object.values(regions).map(r => r.fitStart);
+  const mixed = !byYear && new Set(starts).size > 1;
+  const shortened = Object.entries(regions).filter(([, r]) => r.fitStart && r.fitStart !== firstYear);
+  $("comparisonNote").textContent = mixed ? shortened.map(([name, r]) => "* " + name + " is fitted over " + r.fitStart + "–" +
+    period.end + " because its record has a gap in " + (r.fitStart - 1) + ". Its global column uses the same years. " +
+    "Rows with different years are not a like-for-like comparison.").join(" ") : "";
   $("comparisonCaption").textContent = byYear ? selectedYear + " temperatures in °C above or below the 1951–1980 average." : "Warming rates in °C per decade. Each region and its global comparison use the same years.";
   $("comparison").replaceChildren(...Object.entries(regions).map(([name, region]) => {
     const row = document.createElement("tr");
@@ -282,7 +363,9 @@ function regionalTable() {
     row.append(label);
     const i = selectedYear - firstYear;
     const local = region.series[i], global = period.series[i];
-    row.insertCell().textContent = byYear ? selectedYear : region.fitStart ? region.fitStart + "–" + period.end : "Incomplete";
+    const fitted = region.fitStart ? region.fitStart + "–" + period.end + (mixed && region.fitStart !== firstYear ? " *" : "") : "Incomplete";
+    row.insertCell().textContent = byYear ? selectedYear : fitted;
+    if (mixed && region.fitStart !== firstYear) row.classList.add("shortfit");
     const metrics = byYear ? [local, global, Number.isFinite(local) ? local-global : null]
       : [region.stats?.[0], region.globalRate, region.relative?.[0]];
     for (const value of metrics) {
@@ -308,14 +391,20 @@ function render() {
   $("year").value = selectedYear;
   $("yearValue").value = selectedYear;
   $("legendUnits").textContent = byYear ? "°C" : "°C / decade";
-  $("scaleLow").textContent = byYear ? "≤ −3" : "≤ −1";
-  $("scaleHigh").textContent = byYear ? "≥ +3" : "≥ +1";
+  const limit = byYear ? 3 : limits[mode][firstYear];
+  $("scaleLow").textContent = "≤ −" + limit;
+  $("scaleHigh").textContent = "≥ +" + limit;
+  $("overlayKey").hidden = byYear;
+  for (const button of $("cases").querySelectorAll("button"))
+    button.setAttribute("aria-pressed", String(button.dataset.case === activeCase));
+  $("story").textContent = activeCase ? storyText(activeCase) : "";
+  $("story").hidden = !activeCase;
   $("missingLabel").textContent = byYear ? "Missing this year" : "Incomplete record";
   map.setAttribute("aria-label", "World temperature " + (byYear ? "anomaly" : "trend") + " map. Click a cell or move with the arrow keys.");
   $("legendText").textContent = byYear ? "Temperature above or below the 1951–1980 average" : mode === "relative" ? "Local minus global · blue below global, red above" : "Temperature trend";
   makeMap(land);
   regionalTable();
-  show(selected || {region:"Arctic"});
+  show(selected || {region: cases[activeCase]?.region || "Arctic"});
 }
 
 async function selectPeriod(start) {
@@ -327,9 +416,13 @@ async function selectPeriod(start) {
         const size = (periods[start].series.length + 6) * cols * rows * 4;
         if (buffer.byteLength !== size) throw Error("Incomplete map file");
         return new Float32Array(buffer);
+      }).then(async data => {
+        const marks = new Uint8Array(await get("flags-" + start + ".bin").then(r => r.arrayBuffer()));
+        if (marks.length !== cols * rows) throw Error("Incomplete flag file");
+        return {data, marks};
       }).catch(error => { files.delete(start); throw error; }));
     }
-    const data = await files.get(start);
+    const {data, marks} = await files.get(start);
     if (requestedYear !== start) return;
     firstYear = start;
     period = periods[start];
@@ -337,6 +430,7 @@ async function selectPeriod(start) {
     stride = years + 6;
     regions = period.regions;
     cells = data;
+    flags = marks;
     render();
     $("status").textContent = "";
   } catch {
@@ -347,6 +441,7 @@ async function selectPeriod(start) {
 $("views").addEventListener("click", event => {
   if (!cells || !event.target.dataset.view) return;
   byYear = event.target.dataset.view === "annual";
+  activeCase = null;
   render();
 });
 $("year").addEventListener("input", () => {
@@ -365,11 +460,12 @@ $("year").addEventListener("input", () => {
 });
 
 $("periods").addEventListener("click", event => {
-  if (event.target.dataset.start) selectPeriod(Number(event.target.dataset.start));
+  if (event.target.dataset.start) { activeCase = null; selectPeriod(Number(event.target.dataset.start)); }
 });
 $("modes").addEventListener("click", event => {
   if (cells && event.target.dataset.mode) {
     mode = event.target.dataset.mode;
+    activeCase = null;
     render();
   }
 });
@@ -379,6 +475,7 @@ async function load() {
     get("periods.json").then(r => r.json()), get("land.json").then(r => r.json())
   ]);
   $("views").disabled = false;
+  $("cases").disabled = false;
   $("periods").disabled = false;
   $("modes").disabled = false;
   await selectPeriod(firstYear);
