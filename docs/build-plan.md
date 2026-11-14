@@ -1,0 +1,8 @@
+# Dipole build plan
+
+1. **Choose the regions.** Record the Arctic boundary and the coordinates of the North Atlantic box south of Greenland before looking at the trends. Use 1980–2025 for both.
+2. **Make the first chart.** Download the NASA GISTEMP v4 monthly grid. Record the source and version, account for grid cell area, and document how missing observations are handled. Plot one annual temperature anomaly per region on the same axes. An anomaly is the difference from a reference average.
+3. **Check the numbers.** Estimate each rate in °C per decade and a 95% uncertainty interval that accounts for similar temperatures in nearby years. Check the calculation on a series with a known trend. To claim one region warmed faster, estimate the trend in the yearly difference using years observed in both regions.
+4. **Make the map clickable.** Precompute each cell’s annual series, rate and uncertainty. Show the two starting regions and let the visitor choose a third location. Label missing coverage. If the map marks significant trends, adjust for testing many cells at once.
+5. **Put the temperature demo online.** Publish the static site, then ask someone new to open it on a phone, pick a place, and explain its trend. Once that works, add a variable switcher and a northwest India case using GRACE total water storage. Keep rainfall as a stretch goal.
+6. **Prepare the submission.** Lead the demo with the question, show the two regions, then let the viewer explore. Credit each dataset, describe how AI was used, check the public links and submit through the Project tab on the team page. [Official event instructions](https://www.spaceappschallenge.org/2026/)
