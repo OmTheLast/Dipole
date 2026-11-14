@@ -6,3 +6,4 @@ raw/
 .env
 .env.local
 /plan
+/recovery/

@@ -6,7 +6,8 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 
 | Link Text | Link URL | How Dipole used it |
 | --- | --- | --- |
-| NASA GISS Surface Temperature Analysis (GISTEMP v4) | https://data.giss.nasa.gov/gistemp/ | Primary dataset. We used monthly surface temperature anomalies to calculate annual regional and grid-cell averages and warming rates for 1980–2025. Accessed 14 November 2026. |
+| NASA GISS Surface Temperature Analysis (GISTEMP v4) | https://data.giss.nasa.gov/gistemp/ | Primary dataset. We used monthly surface temperature anomalies to calculate annual regional and grid-cell averages and warming rates for the 1900–2025 and 1980–2025 views. Accessed 14 November 2026. |
+| NASA GISTEMP global annual land–ocean temperature anomalies | https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv | The January–December global mean supplies the reference history. Local and global trends use matching years. Accessed 14 November 2026. |
 | NASA GISTEMP v4 data downloads | https://data.giss.nasa.gov/gistemp/data_v4.html | Identifies the 2° Land–Ocean Temperature Index grid with 1,200 km smoothing. |
 | NASA GISTEMP v4 Land–Ocean Temperature Index, monthly NetCDF file | https://data.giss.nasa.gov/pub/gistemp/gistemp1200_GHCNv4_ERSSTv5.nc.gz | The file used for the chart. NASA generated this snapshot on 10 November 2026. The link updates as NASA revises the data. |
 | NASA GISTEMP frequently asked questions | https://data.giss.nasa.gov/gistemp/faq/ | Explains the reference period, how NASA combines land and ocean measurements, and how it estimates values between observations. |
@@ -30,7 +31,7 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 
 ## AI use and planning references
 
-OpenAI Codex helped draft the analysis code, run numerical checks, and prepare documentation. Claude was used in the initial planning material shared by the team. These entries can also support the AI-use field. [Codex](https://openai.com/codex/) · [Claude](https://claude.ai/) · [NT project workflows used for research, decisions and numerical checks](https://github.com/NakliTechie/ntkit)
+AI tools assisted with planning, analysis code, numerical checks, and documentation. [OpenAI Codex](https://openai.com/codex/) · [Project workflows](https://github.com/NakliTechie/ntkit)
 
 The team used the official challenge brief to define the four questions the product should answer and the event page to plan submission. [Challenge brief](https://www.spaceappschallenge.org/2026/challenges/earth-system-trend-detective/) · [Event and submission instructions](https://www.spaceappschallenge.org/2026/)
 

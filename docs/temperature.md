@@ -55,4 +55,17 @@ The second script reads the packed temperature values with a separate NetCDF rea
 
 Of 16,200 cells, 15,805 have all 46 complete calendar years. The map reports a rate for these cells using the same trend fit as the regional analysis. Multiplying the rate and its interval by 4.5 gives the **fitted** change over the 45 years between 1980 and 2025. These pointwise intervals describe the selected cell. The map color shows rate alone. At cells with gaps the chart and table show the available complete years.
 
-From the repository root, run `.venv/bin/python analysis/export_map.py` after reproducing the regional results. This writes the browser data to `docs/map/`. Run `.venv/bin/python analysis/check_map.py` to check them. Serve the site locally with `python3 -m http.server --directory docs`.
+### Comparing two periods with the global record
+
+The explorer also covers 1900–2025. In each view, the relative trend is the fitted slope of the annual local anomaly minus the annual global anomaly. Its interval uses the same fit on that difference. The history chart shows both original annual series and the local fitted line.
+
+For the longer period, 11,794 cells have complete histories. The North Atlantic region meets the coverage rule in all 126 years. The Arctic meets it in 111 years. Its last gap is 1920, so the Arctic trend and its global reference both use the continuous record from 1921 through 2025. The chart retains the earlier annual values that meet the coverage rule.
+
+To rebuild the explorer, download the NASA global table in addition to the grid above. The global table snapshot used here has SHA-256 `a7b1939db2e7e484c798e925e0f07f8184356c52ac0e7ce264adcd0f25e81253`.
+
+```sh
+curl -fL --retry 2 'https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv' -o raw/global.csv
+.venv/bin/python analysis/export_map.py
+.venv/bin/python analysis/check_map.py
+python3 -m http.server 8765 --bind 127.0.0.1 --directory docs
+```
