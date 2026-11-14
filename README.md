@@ -2,7 +2,7 @@
 
 **Pick a place on the world map to see its estimated surface temperature change from 1980 to 2025, its annual history, and the uncertainty in the trend.**
 
-[Open the temperature explorer](https://omthelast.github.io/Dipole/)
+[Open the temperature explorer](https://ompatnaik.com/Dipole/)
 
 ![Annual temperatures in the Arctic and the North Atlantic relative to their 1951–1980 averages](results/temperature.png)
 
