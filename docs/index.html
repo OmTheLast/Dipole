@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f7f6f0">
 <title>Dipole · Temperature explorer</title>
-<link rel="stylesheet" href="map/style.css?v=cases-2">
-<script src="map/app.js?v=cases-2" defer></script>
+<link rel="stylesheet" href="map/style.css?v=population-1">
+<script src="map/app.js?v=population-1" defer></script>
 </head>
 <body>
-<header><div class="brand"><span class="brandmark" aria-hidden="true"></span>Dipole</div><nav aria-label="Project"><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources ↗</a><a href="https://github.com/OmTheLast/Dipole">GitHub ↗</a></nav></header>
+<header><div class="brand"><span class="brandmark" aria-hidden="true"></span>Dipole</div><nav aria-label="Project"><a href="water/">Water storage</a><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources ↗</a><a href="https://github.com/OmTheLast/Dipole">GitHub ↗</a></nav></header>
 <main>
 <section class="intro"><div><p class="eyebrow">Earth System Trend Detective</p><h1>Temperature explorer</h1><p>Pick a place to see how its surface temperature changed.</p></div></section>
 <fieldset id="cases" class="cases" disabled><legend>Start with a finding</legend><button data-case="hole" aria-pressed="true">The warming hole</button> <button data-case="arctic" aria-pressed="false">Arctic amplification</button> <button data-case="recent" aria-pressed="false">Is amplification new?</button></fieldset>
@@ -25,7 +25,13 @@
 <div class="workspace">
 <section class="atlas" aria-label="Global temperature map">
 <div class="panelhead"><h2>World map</h2><span>2° × 2° grid</span></div>
-<div class="mapframe"><canvas id="map" tabindex="0" aria-label="World temperature trend map. Click to select a cell or move with arrow keys. You can also enter coordinates below."></canvas></div>
+<div class="mapframe">
+<div class="maptools" role="group" aria-label="Map navigation">
+<button id="zoomOut" aria-label="Zoom out" disabled>−</button><output id="zoomLevel" aria-label="Map zoom">1×</output><button id="zoomIn" aria-label="Zoom in" disabled>+</button>
+<button id="worldView" disabled>World view</button><span id="mapHint">Zoom in to drag the map. Select a cell for details.</span>
+</div>
+<div class="maparea"><canvas id="map" tabindex="0" aria-describedby="mapHint" aria-label="World temperature map"></canvas><div id="cellTip" hidden></div></div>
+</div>
 <div class="legend"><span><span id="legendText">Temperature trend</span> <b id="legendUnits">°C / decade</b></span><div class="scale"><div class="gradient"></div><div class="ticks"><span id="scaleLow">≤ −1</span><span>0</span><span id="scaleHigh">≥ +1</span></div></div><span class="missing"><i></i> <span id="missingLabel">Incomplete record</span></span><span id="overlayKey" class="overlaykey"><span class="hatchkey"><i></i> 250 km grid has data in fewer than half the months</span></span></div>
 <div class="locations"><h3>Explore a place</h3><div class="presets" id="presets">
 <button data-region="Arctic">Arctic region</button><button data-region="North Atlantic">North Atlantic region</button><button data-lat="13.08" data-lon="80.27">Cell near Chennai</button></div>
@@ -33,9 +39,22 @@
 </section>
 <section class="inspector" aria-label="Selected location">
 <div class="panelhead"><h2>Location details</h2><span id="kind">Region</span></div>
-<div id="details" aria-live="polite"><h3 id="name">Arctic</h3><p id="bounds"></p><p id="coverage"></p><p class="metriclabel" id="metricLabel">Estimated change</p><div id="change">…</div><p id="rate"></p><p id="reference"></p><p id="interval"></p><p id="explain"></p><p id="sparse"></p></div>
+<div id="details" aria-live="polite"><h3 id="name">Arctic</h3><p id="bounds"></p><p id="coverage"></p><p class="metriclabel" id="metricLabel">Estimated change</p><div id="change">…</div><p id="rate"></p><p id="reference"></p><p id="interval"></p><p id="explain"></p><p id="sparse"></p><p id="cellResidents" class="note"></p></div>
 <div class="history"><h3>Annual temperature history</h3><div class="caption">°C above or below the 1951–1980 average</div><div class="chartkey"><span>Local</span><span>Global</span><span id="fitKey">Local fitted trend</span></div><canvas id="plot" role="img" aria-label="Annual temperature anomaly chart"></canvas><details><summary>See annual values</summary><div class="tablebox"><table><thead><tr><th>Year</th><th>Local (°C)</th><th>Global (°C)</th></tr></thead><tbody id="annual"></tbody></table></div></details></div>
 </section></div>
+<section id="population" class="summary atlas" aria-labelledby="exposureHeading">
+<h2 id="exposureHeading">How many people lived in places warming faster than the world?</h2>
+<p id="exposureCaption">Loading 2020 population estimates…</p>
+<div id="exposureData" hidden><div class="scrolltable"><table>
+<thead><tr><th scope="col">Area</th><th scope="col">Residents in faster-warming cells</th><th scope="col">Share of covered residents</th><th scope="col">Residents with a trend</th><th scope="col">Residents without a trend</th></tr></thead>
+<tbody id="exposureRows"></tbody></table></div>
+<figure class="populationBar"><figcaption>India’s residents in cells with a temperature trend</figcaption>
+<div class="populationTrack" aria-hidden="true"><span id="indiaFasterBar"></span></div>
+<div class="populationLabels"><span id="indiaFasterLabel"></span><span id="indiaOtherLabel"></span></div></figure>
+<details><summary>How the count and uncertainty work</summary>
+<p>We add the estimated 2020 residents of each 2° cell whose local warming rate exceeds the global rate. The percentage uses residents in cells with a complete trend. For India, we count only population pixels whose centres fall inside the mapped country boundary.</p>
+<p id="exposureIntervals"></p><p>These cell-by-cell intervals can be too narrow for short records. The population counts describe where people lived in 2020. Health outcomes require separate data.</p>
+</details></div></section>
 <section class="summary atlas"><h2>Regional comparison</h2><p id="comparisonCaption"></p><div class="scrolltable"><table><thead><tr><th scope="col">Region</th><th scope="col" id="timeHeading">Years fitted</th><th scope="col">Local</th><th scope="col">Global</th><th scope="col">Local − global</th></tr></thead><tbody id="comparison"></tbody></table></div><p id="comparisonNote" class="note"></p></section>
 <details class="method"><summary>How to read the trends and uncertainty</summary>
 <p>Each trend is the slope of a straight line through annual temperatures relative to the 1951–1980 average. For the global comparison we fit the yearly local minus global differences. A negative difference means a place warmed more slowly than the world or cooled more quickly. The chart shows the two original histories.</p>
