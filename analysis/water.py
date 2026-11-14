@@ -6,6 +6,7 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.dates import date2num
 from matplotlib.ticker import MaxNLocator
 import netCDF4 as nc
 import numpy as np
@@ -64,7 +65,47 @@ def annual_fit(seasons):
                 sen=float(theilslopes(good, years).slope*10))
 
 
+def export_water_map(ds, labels, seasons, features):
+    # Display in geographic order, from 180°W to 180°E and north to south.
+    lat = np.asarray(ds["lat"][:])
+    lon = np.asarray(ds["lon"][:])
+    assert np.allclose(lat, np.arange(-89.75, 90, .5))
+    assert np.allclose(lon, np.arange(.25, 360, .5))
+    land = np.asarray(ds["land_mask"][:]) == 1
+    ids = np.asarray(ds["mascon_ID"][:])[land]
+    _, first, index = np.unique(ids, return_index=True, return_inverse=True)
+    grid = np.zeros(land.shape, dtype=int)
+    grid[land] = index + 1  # Keep zero for ocean.
+    grid = np.roll(grid[::-1], len(lon) // 2, axis=1)
+    runs = []
+    for row in grid:
+        starts = np.r_[0, np.flatnonzero(np.diff(row)) + 1]
+        runs.append(np.column_stack((starts, row[starts])).ravel().tolist())
+
+    values = {}
+    for year in seasons.dropna().index:
+        positions = [labels.index(pd.Period(f"{year}-{month}", freq="M")) for month in (10, 11)]
+        fields = ds["lwe_thickness"][positions, :, :][:, land]
+        assert not np.ma.getmaskarray(fields).any()
+        mean = np.asarray(fields, dtype=float).mean(axis=0)
+        assert np.isfinite(mean).all() and np.allclose(mean, mean[first][index], atol=.001, rtol=0)
+        values[int(year)] = np.round(mean[first], 2).tolist()
+
+    states = []
+    for feature in features:
+        props = feature["properties"]
+        if props["iso_3166_2"] in STATES:
+            geometry = feature["geometry"]
+            assert geometry["type"] == "Polygon"
+            rings = [np.round(ring, 3).tolist() for ring in geometry["coordinates"]]
+            states.append(dict(name=props["name"], center=[props["longitude"], props["latitude"]], rings=rings))
+    (DEST/"map.json").write_text(json.dumps(dict(rows=runs, years=values, states=states),
+                                            separators=(",", ":"), allow_nan=False))
+
+
 def plots(monthly, seasons, fit):
+    markers = {}
+    matplotlib.rcParams["svg.hashsalt"] = "dipole-water"
     for monthly_view in [False, True]:
         fig, ax = plt.subplots(figsize=(8.4, 3.25), layout="constrained")
         fig.patch.set_alpha(0)
@@ -86,8 +127,21 @@ def plots(monthly, seasons, fit):
         ax.tick_params(length=0, labelsize=10, pad=5, colors="#344940")
         ax.yaxis.set_major_locator(MaxNLocator(6))
         ax.set_ylabel("Water storage anomaly (cm)")
-        fig.savefig(DEST / ("monthly.svg" if monthly_view else "post-monsoon.svg"))
+        view = "monthly" if monthly_view else "post-monsoon"
+        # Freeze the final SVG layout before recording the scrubber positions.
+        fig.canvas.draw()
+        fig.set_layout_engine("none")
+        position = ax.get_position()
+        left, right = ax.get_xlim()
+        markers[view] = dict(top=1-position.y1, bottom=1-position.y0, years={})
+        for year in seasons.index:
+            x = date2num(pd.Timestamp(year=int(year), month=10, day=16)) if monthly_view else year
+            markers[view]["years"][int(year)] = position.x0 + (x-left)/(right-left)*position.width
+        path = DEST / (view + ".svg")
+        fig.savefig(path, metadata={"Date": None})
+        path.write_text("\n".join(line.rstrip() for line in path.read_text().splitlines()) + "\n")
         plt.close(fig)
+    return markers
 
 
 def main():
@@ -123,12 +177,14 @@ def main():
     seasons = grouped.mean().where(grouped.count() == 2)
     fit = annual_fit(seasons)
     DEST.mkdir(exist_ok=True)
-    plots(monthly, seasons, fit)
+    with nc.Dataset(args.netcdf) as ds:
+        export_water_map(ds, labels, seasons, features)
+    markers = plots(monthly, seasons, fit)
     def obs(m):
         value = monthly.get(m, np.nan)
         return round(float(value), 3) if np.isfinite(value) else None
     data = dict(source=args.netcdf.name, areaKm2=round(float(area.sum())),
-                start=str(monthly.index[0]), end=str(monthly.index[-1]), months=int(series.size), fit=fit,
+                start=str(monthly.index[0]), end=str(monthly.index[-1]), months=int(series.size), fit=fit, markers=markers,
                 seasons=[dict(year=int(y), october=obs(f"{y}-10"), november=obs(f"{y}-11"),
                               mean=round(v, 3) if np.isfinite(v) else None) for y,v in seasons.items()])
     (DEST/"series.json").write_text(json.dumps(data, indent=2, allow_nan=False)+"\n")

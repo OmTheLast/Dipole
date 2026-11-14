@@ -6,7 +6,7 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 
 | Link Text | Link URL | How Dipole used it |
 | --- | --- | --- |
-| JPL GRACE and GRACE-FO mascon water storage, RL06.3Mv04 CRI | https://doi.org/10.5067/TEMSC-3JC634 | Monthly liquid water equivalent thickness used in the northwest India chart. The source file spans April 2002 to September 2026. Retrieved 14 November 2026. |
+| JPL GRACE and GRACE-FO mascon water storage, RL06.3Mv04 CRI | https://doi.org/10.5067/TEMSC-3JC634 | Monthly water storage anomalies for the northwest India chart and global post-monsoon map. The land mask and mascon IDs locate each regional measurement. The source file spans April 2002 to September 2026. Retrieved 14 November 2026. |
 | NASA JPL mascon user guide | https://grace.jpl.nasa.gov/data/get-data/jpl_global_mascons/ | Documents the 2004–2009 reference average, spatial resolution, processing and optional gain factors. |
 | NASA GISS Surface Temperature Analysis (GISTEMP v4) | https://data.giss.nasa.gov/gistemp/ | Primary dataset. We used monthly surface temperature anomalies to calculate annual regional and grid-cell averages and warming rates for the 1900–2025 and 1980–2025 views. Accessed 14 November 2026. |
 | NASA GISTEMP global annual land–ocean temperature anomalies | https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv | The January–December global mean supplies the reference history. Local and global trends use matching years. Accessed 14 November 2026. |
@@ -24,7 +24,7 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 | Rantanen et al. (2022), The Arctic has warmed nearly four times faster than the globe since 1979 | https://doi.org/10.1038/s43247-022-00498-3 | Research precedent for the Arctic boundary. Dipole calculated its own rate against a different comparison region. |
 | Allan et al., Seasonal Changes in the North Atlantic Cold Anomaly | https://doi.org/10.1029/2019JC015379 | Scientific context for investigating surface temperatures south of Greenland. |
 | Molodtsov et al., North Atlantic temperature and salinity changes | https://doi.org/10.1038/s41612-025-01210-w | Background for studying the subpolar latitude band. Dipole selected its own longitude limits. |
-| Natural Earth, 1:10m state and province boundaries v5.1.2 | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson | Delineates Rajasthan, Punjab, Haryana and Delhi for the regional water-storage average. |
+| Natural Earth, 1:10m state and province boundaries v5.1.2 | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson | Delineates Rajasthan, Punjab, Haryana and Delhi for the regional water-storage average and outlines the four areas on the water map. |
 | Rodell et al. (2009), Satellite-based estimates of groundwater depletion in India | https://doi.org/10.1038/nature08238 | Defines the four-area study region. Dipole estimates total water storage. |
 | Gravity Toolkit mission-month documentation | https://gravity-toolkit.readthedocs.io/en/stable/api_reference/time.html | Identifies shifted observation dates for the December 2011 and May 2015 nominal mission months. |
 | Natural Earth, 1:110m land polygons | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_110m_land.geojson | Public-domain coastline geometry used to orient visitors on the clickable world map. Retrieved 14 November 2026. |
