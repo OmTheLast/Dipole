@@ -67,25 +67,14 @@ To rebuild the explorer, download the NASA global table in addition to the grid 
 curl -fL --retry 2 'https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv' -o raw/global.csv
 .venv/bin/python analysis/export_map.py
 .venv/bin/python analysis/check_map.py
-.venv/bin/python analysis/field_significance.py
-.venv/bin/python analysis/check_significance.py
+.venv/bin/python analysis/station_coverage.py
+.venv/bin/python analysis/check_coverage.py
 python3 -m http.server 8765 --bind 127.0.0.1 --directory docs
 ```
 
-### Map-wide significance and interpolated cells
+### Hatched cells
 
-The map tests thousands of cells at once. We convert each cell's 95% interval back to its p-value (the interval comes from Newey–West standard errors and a t distribution with n − 2 degrees of freedom) and apply the Benjamini–Hochberg false discovery rate test at q = 0.05 across all complete cells. The test runs separately for each period and for local and relative trends. Cells that do not pass carry a dot. [Benjamini and Hochberg, 1995](https://doi.org/10.1111/j.2517-6161.1995.tb02031.x)
-
-| Period | Map | Complete cells | Raw p < 0.05 | Pass FDR (q = 0.05) |
-| --- | --- | ---: | ---: | ---: |
-| 1980–2025 | Local trend | 15,805 | 12,279 | 12,118 |
-| 1980–2025 | Local − global | 15,805 | 9,690 | 8,919 |
-| 1900–2025 | Local trend | 11,794 | 11,531 | 11,527 |
-| 1900–2025 | Local − global | 11,794 | 6,538 | 5,856 |
-
-`check_significance.py` confirms the recovered p-values equal statsmodels' own, that the test matches statsmodels' `fdr_bh`, and runs a null simulation. On 2,000 trendless AR(1) series (46 years, lag-1 correlation 0.3), 263 pointwise tests fell below p = 0.05 and 27 passed the FDR test. Newey–West p-values with 46 years are therefore anti-conservative (about 13% false positives instead of 5%). The FDR step removes most chance flags, but single-cell intervals remain somewhat too narrow.
-
-NASA's standard grid fills cells from stations up to 1,200 km away. To show where that matters, we used NASA's 250 km land-only grid. A land cell is hatched when the 250 km grid has a value in fewer than half of the period's months: 850 of 5,392 land cells for 1980–2025 and 1,049 for 1900–2025. Land means the cell centre lies inside the Natural Earth outline. Ocean cells use sea surface temperatures and are not hatched. The saved station-support mask is in `analysis/station_support_250km.json`. To recompute it, download the 250 km grid to `raw/gistemp250.nc` before running `field_significance.py`:
+NASA's standard grid fills cells from stations up to 1,200 km away. The map hatches land cells where NASA's 250 km grid has data in fewer than half the months of the selected period: 850 of 5,392 land cells for 1980–2025 and 1,049 for 1900–2025. A cell counts as land when its centre lies inside the Natural Earth outline. Ocean cells are not hatched. The saved monthly coverage is in `analysis/station_support_250km.json`, and `check_coverage.py` confirms the map files match it. To recompute it, download the 250 km grid to `raw/gistemp250.nc` before running `station_coverage.py`:
 
 ```sh
 curl -fL -o raw/gistemp250.nc.gz https://data.giss.nasa.gov/pub/gistemp/gistemp250_GHCNv4.nc.gz

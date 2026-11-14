@@ -11,11 +11,10 @@ let fitLine, requestedYear = firstYear;
 let activeCase = "hole";
 const files = new Map();
 const colors = [[33,89,129], [141,188,203], [243,238,219], [228,154,99], [164,57,47]];
-let cells, flags, regions, base, selected, series, selectedBounds;
+let cells, coverage, regions, base, selected, series, selectedBounds;
 // Colour limits (°C/decade) chosen per view so that roughly the largest 2% of cells saturate.
 // One fixed ±1 scale washed out the long-period differences, which are about ±0.1.
 const limits = {absolute: {1980: 1, 1900: 0.3}, relative: {1980: 0.6, 1900: 0.15}};
-const FDR_Q = 0.05;
 const cases = {
   hole: {start: 1900, mode: "relative", region: "North Atlantic"},
   arctic: {start: 1980, mode: "relative", region: "Arctic"},
@@ -85,22 +84,19 @@ function makeMap(land) {
   const ctx = base.getContext("2d");
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(gridImage, 0, 0, base.width, base.height);
-  if (!byYear && flags) drawOverlays(ctx, field);
+  if (!byYear && coverage) drawHatching(ctx);
   ctx.drawImage(coastlines, 0, 0);
 }
-// Dots: complete cells whose trend does not survive the map-wide false discovery rate test.
-// Hatching: land cells where NASA has a station within 250 km in fewer than half the months.
-function drawOverlays(ctx, field) {
-  const size = base.width / cols, bit = field === 3 ? 2 : 1;
-  ctx.fillStyle = "rgba(24,36,33,.62)";
+// Hatching: land cells where NASA's 250 km grid has data in fewer than half the months.
+function drawHatching(ctx) {
+  const size = base.width / cols;
   ctx.strokeStyle = "rgba(24,36,33,.5)";
   ctx.lineWidth = 1;
   ctx.beginPath();
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const id = r*cols + c, x = c*size, y = (rows-1-r)*size;
-      if (Number.isFinite(cells[id*stride]) && !(flags[id] & bit)) ctx.fillRect(x + size/2 - 1.25, y + size/2 - 1.25, 2.5, 2.5);
-      if ((flags[id] & 4) && Number.isFinite(cells[id*stride])) { ctx.moveTo(x, y + size); ctx.lineTo(x + size, y); }
+      if (coverage[id] && Number.isFinite(cells[id*stride])) { ctx.moveTo(x, y + size); ctx.lineTo(x + size, y); }
     }
   }
   ctx.stroke();
@@ -257,7 +253,6 @@ function showAnnualDetails() {
   $("reference").textContent = "Global anomaly: " + changeText(period.series[i]) + " °C";
   $("interval").textContent = "";
   $("explain").textContent = available ? "" : "Too little coverage for an annual estimate here.";
-  $("robust").textContent = "";
   $("sparse").textContent = "";
 }
 function showTrendDetails(stats, relative, fitStart, globalRate, cell) {
@@ -286,11 +281,8 @@ function showTrendDetails(stats, relative, fitStart, globalRate, cell) {
       high < 0 ? "The interval supports cooling here." : "The interval includes zero. The direction is uncertain.";
   }
   $("explain").textContent = interpretation;
-  $("robust").textContent = cell === undefined || !valid ? "" :
-    (flags[cell] & (showGap ? 2 : 1)) ? "Map-wide check: passes the false discovery rate test (q = " + FDR_Q + ") across all " + "complete cells." :
-    "Map-wide check: does not pass the false discovery rate test (q = " + FDR_Q + "). Treat this cell's result as uncertain.";
-  $("sparse").textContent = cell !== undefined && (flags[cell] & 4) ?
-    "Few nearby stations: NASA has a station within 250 km here in fewer than half the months, so this value is mostly interpolated from distant stations." : "";
+  $("sparse").textContent = cell !== undefined && coverage[cell] ?
+    "NASA’s 250 km grid has data here in fewer than half the months." : "";
   fitLine = null;
   if (valid) {
     const offset = fitStart - firstYear;
@@ -328,7 +320,9 @@ $("cases").addEventListener("click", event => {
   byYear = false;
   mode = story.mode;
   selected = {region: story.region};
-  if (story.start === firstYear) render(); else selectPeriod(story.start);
+  // Always go through selectPeriod: it records this as the latest request, so a slower,
+  // earlier load (e.g. 1980 for another preset) is ignored when it finishes.
+  selectPeriod(story.start);
 });
 $("presets").addEventListener("click",e=>{
   const b=e.target.closest("button"); if (!b) return;
@@ -417,8 +411,8 @@ async function selectPeriod(start) {
         if (buffer.byteLength !== size) throw Error("Incomplete map file");
         return new Float32Array(buffer);
       }).then(async data => {
-        const marks = new Uint8Array(await get("flags-" + start + ".bin").then(r => r.arrayBuffer()));
-        if (marks.length !== cols * rows) throw Error("Incomplete flag file");
+        const marks = new Uint8Array(await get("coverage-" + start + ".bin").then(r => r.arrayBuffer()));
+        if (marks.length !== cols * rows) throw Error("Incomplete coverage file");
         return {data, marks};
       }).catch(error => { files.delete(start); throw error; }));
     }
@@ -430,7 +424,7 @@ async function selectPeriod(start) {
     stride = years + 6;
     regions = period.regions;
     cells = data;
-    flags = marks;
+    coverage = marks;
     render();
     $("status").textContent = "";
   } catch {
