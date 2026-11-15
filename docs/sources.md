@@ -31,6 +31,7 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 | European Commission, GHS-POP R2023A, 2020 residential population | https://human-settlement.emergency.copernicus.eu/ghs_pop2023.php | Counts of estimated residents at 30 arc-seconds, summed into Dipole’s 2° cells. Retrieved 14 November 2026. |
 | Natural Earth, 1:10m country boundaries v5.1.2 | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_10m_admin_0_countries.geojson | India’s mapped boundary selects population pixels by their centres, including in cross-border temperature cells. |
 | Rasterio | https://rasterio.readthedocs.io/ | Read the population raster and applied the country boundary on its native grid. |
+| Schibsted Grotesk typeface, SIL Open Font License 1.1 | https://github.com/schibsted/schibsted-grotesk | The site's only typeface, self-hosted in docs/fonts from the Fontsource package. |
 | Python | https://www.python.org/ | Ran the analysis and verification scripts. |
 | Unidata netCDF4 for Python | https://unidata.github.io/netcdf4-python/ | Read NASA’s monthly grid, dates and missing values. |
 | NumPy | https://numpy.org/ | Calculated area-weighted regional averages and annual differences. |

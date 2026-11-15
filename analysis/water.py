@@ -121,8 +121,6 @@ def plots(monthly, seasons, fit):
             ax.scatter(dates[post], monthly[post], s=12, color="#203f68", zorder=3)
         else:
             ax.plot(seasons.index, seasons, "o-", color="#245c65", linewidth=1.5, markersize=4)
-            ends = np.array([fit["first"], fit["last"]])
-            ax.plot(ends, fit["intercept"]+(ends-fit["first"])*fit["slope"]/10, "--", color="#ad5b31")
             ax.set_xticks(sorted({fit["first"], *range(2005, fit["last"], 5), fit["last"]}))
         ax.tick_params(length=0, labelsize=10, pad=5, colors="#344940")
         ax.yaxis.set_major_locator(MaxNLocator(6))

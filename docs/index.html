@@ -3,63 +3,86 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f6f0">
-<title>Dipole · Temperature explorer</title>
-<link rel="stylesheet" href="map/style.css?v=population-1">
-<script src="map/app.js?v=population-1" defer></script>
+<meta name="theme-color" content="#102a43">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>Dipole · Same planet, opposite trends</title>
+<meta name="description" content="Explore how surface temperature changed at every place on Earth since 1900, using NASA’s GISTEMP record.">
+<link rel="preload" href="fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="map/style.css?v=design-2">
+<script src="map/app.js?v=design-2" defer></script>
 </head>
 <body>
-<header><div class="brand"><span class="brandmark" aria-hidden="true"></span>Dipole</div><nav aria-label="Project"><a href="water/">Water storage</a><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources ↗</a><a href="https://github.com/OmTheLast/Dipole">GitHub ↗</a></nav></header>
-<main>
-<section class="intro"><div><p class="eyebrow">Earth System Trend Detective</p><h1>Temperature explorer</h1><p>Pick a place to see how its surface temperature changed.</p></div></section>
-<fieldset id="cases" class="cases" disabled><legend>Start with a finding</legend><button data-case="hole" aria-pressed="true">The warming hole</button> <button data-case="arctic" aria-pressed="false">Arctic amplification</button> <button data-case="recent" aria-pressed="false">Is amplification new?</button></fieldset>
+<div class="deep">
+<header class="top"><a class="brand" href="./"><span class="brandmark" aria-hidden="true"></span>Dipole</a><nav aria-label="Project"><a href="./" aria-current="page">Temperature</a><a href="water/">Water</a><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources</a><a href="https://github.com/OmTheLast/Dipole">GitHub</a></nav></header>
+
+<section class="hero">
+<h1>Same planet,<br>opposite trends.</h1>
+<p class="lede">The world has warmed about 0.1 °C per decade since 1900. The Arctic has raced ahead. The sea south of Greenland has barely warmed at all. Choose a finding, or select any place on the map, to see how its temperature changed in NASA’s GISTEMP record.</p>
+</section>
+
+<fieldset id="cases" class="cases" disabled><legend class="visually-hidden">Start with a finding</legend>
+<button data-case="hole" aria-pressed="true"><b>The warming hole</b><small>North Atlantic, since 1900</small></button>
+<button data-case="arctic" aria-pressed="false"><b>Arctic amplification</b><small>Arctic, since 1980</small></button>
+<button data-case="recent" aria-pressed="false"><b>Is amplification new?</b><small>Arctic, since 1900</small></button>
+</fieldset>
 <p id="story" class="story"></p>
+
 <div class="controls">
-<fieldset id="views" disabled><legend>Explore</legend><button data-view="trend" aria-pressed="true">Trend</button> <button data-view="annual" aria-pressed="false">By year</button></fieldset>
-<fieldset id="periods" disabled><legend>Time period</legend><button data-start="1900" aria-pressed="true">1900–2025</button> <button data-start="1980" aria-pressed="false">1980–2025</button></fieldset>
-<fieldset id="modes" disabled><legend>Map colors</legend><button data-mode="absolute" aria-pressed="false">Local trend</button> <button data-mode="relative" aria-pressed="true">Relative to global</button></fieldset>
+<fieldset id="views" class="segmented" disabled><legend>View</legend><button data-view="trend" aria-pressed="true">Trend</button><button data-view="annual" aria-pressed="false">By year</button></fieldset>
+<fieldset id="periods" class="segmented" disabled><legend>Period</legend><button data-start="1900" aria-pressed="true">1900–2025</button><button data-start="1980" aria-pressed="false">1980–2025</button></fieldset>
+<fieldset id="modes" class="segmented" disabled><legend>Colour by</legend><button data-mode="absolute" aria-pressed="false">Local trend</button><button data-mode="relative" aria-pressed="true">Relative to global</button></fieldset>
 </div>
 <div id="scrubber" hidden><label for="year">Year <output id="yearValue" for="year">2015</output></label>
 <div class="yeartrack"><span id="startLabel">1980</span><input id="year" type="range" min="1980" max="2025" step="1" value="2015"><span>2025</span></div></div>
 <p id="status" role="status">Loading NASA temperature estimates…</p>
+
 <div class="workspace">
 <section class="atlas" aria-label="Global temperature map">
-<div class="panelhead"><h2>World map</h2><span>2° × 2° grid</span></div>
-<div class="mapframe">
 <div class="maptools" role="group" aria-label="Map navigation">
 <button id="zoomOut" aria-label="Zoom out" disabled>−</button><output id="zoomLevel" aria-label="Map zoom">1×</output><button id="zoomIn" aria-label="Zoom in" disabled>+</button>
-<button id="worldView" disabled>World view</button><span id="mapHint">Zoom in to drag the map. Select a cell for details.</span>
+<button id="worldView" disabled>Whole world</button><span id="mapHint">Select a cell for details. Zoom in to drag the map.</span>
 </div>
 <div class="maparea"><canvas id="map" tabindex="0" aria-describedby="mapHint" aria-label="World temperature map"></canvas><div id="cellTip" hidden></div></div>
-</div>
-<div class="legend"><span><span id="legendText">Temperature trend</span> <b id="legendUnits">°C / decade</b></span><div class="scale"><div class="gradient"></div><div class="ticks"><span id="scaleLow">≤ −1</span><span>0</span><span id="scaleHigh">≥ +1</span></div></div><span class="missing"><i></i> <span id="missingLabel">Incomplete record</span></span><span id="overlayKey" class="overlaykey"><span class="hatchkey"><i></i> 250 km grid has data in fewer than half the months</span></span></div>
-<div class="locations"><h3>Explore a place</h3><div class="presets" id="presets">
-<button data-region="Arctic">Arctic region</button><button data-region="North Atlantic">North Atlantic region</button><button data-lat="13.08" data-lon="80.27">Cell near Chennai</button></div>
-<form id="coords"><label>Latitude<input type="number" name="lat" required min="-90" max="90" step="any" placeholder="−90 to 90"></label><label>Longitude<input type="number" name="lon" required min="-180" max="180" step="any" placeholder="−180 to 180"></label><button type="submit">Go to cell →</button></form></div>
+<div class="legend"><div class="legendscale"><span class="legendtitle"><span id="legendText">Temperature trend</span> <span id="legendUnits">°C / decade</span></span><div class="scale"><div class="gradient"></div><div class="ticks"><span id="scaleLow">≤ −1</span><span>0</span><span id="scaleHigh">≥ +1</span></div></div></div><span class="missing"><i></i> <span id="missingLabel">Incomplete record</span></span><span id="overlayKey" class="overlaykey"><span class="hatchkey"><i></i> 250 km grid has data in fewer than half the months</span></span></div>
+<div class="locations"><div class="presets" id="presets"><span class="presetlabel">Jump to</span>
+<button data-region="Arctic">Arctic</button><button data-region="North Atlantic">North Atlantic</button><button data-lat="13.08" data-lon="80.27">Chennai</button></div>
+<form id="coords"><label>Latitude<input type="number" name="lat" required min="-90" max="90" step="any" placeholder="−90 to 90"></label><label>Longitude<input type="number" name="lon" required min="-180" max="180" step="any" placeholder="−180 to 180"></label><button type="submit">Show cell</button></form></div>
 </section>
+
 <section class="inspector" aria-label="Selected location">
-<div class="panelhead"><h2>Location details</h2><span id="kind">Region</span></div>
-<div id="details" aria-live="polite"><h3 id="name">Arctic</h3><p id="bounds"></p><p id="coverage"></p><p class="metriclabel" id="metricLabel">Estimated change</p><div id="change">…</div><p id="rate"></p><p id="reference"></p><p id="interval"></p><p id="explain"></p><p id="sparse"></p><p id="cellResidents" class="note"></p></div>
-<div class="history"><h3>Annual temperature history</h3><div class="caption">°C above or below the 1951–1980 average</div><div class="chartkey"><span>Local</span><span>Global</span><span id="fitKey">Local fitted trend</span></div><canvas id="plot" role="img" aria-label="Annual temperature anomaly chart"></canvas><details><summary>See annual values</summary><div class="tablebox"><table><thead><tr><th>Year</th><th>Local (°C)</th><th>Global (°C)</th></tr></thead><tbody id="annual"></tbody></table></div></details></div>
-</section></div>
-<section id="population" class="summary atlas" aria-labelledby="exposureHeading">
-<h2 id="exposureHeading">How many people lived in places warming faster than the world?</h2>
-<p id="exposureCaption">Loading 2020 population estimates…</p>
-<div id="exposureData" hidden><div class="scrolltable"><table>
-<thead><tr><th scope="col">Area</th><th scope="col">Residents in faster-warming cells</th><th scope="col">Share of covered residents</th><th scope="col">Residents with a trend</th><th scope="col">Residents without a trend</th></tr></thead>
-<tbody id="exposureRows"></tbody></table></div>
+<p id="kind" class="kind">Region</p>
+<div id="details" aria-live="polite"><p class="q">Where</p><h2 id="name">Arctic</h2><p id="bounds"></p><p id="coverage"></p><p class="q">What changed, and by how much</p><p class="metriclabel" id="metricLabel">Estimated change</p><div id="change">…</div><p id="rate"></p><p id="reference"></p><p class="q">How certain</p><p id="interval"></p><p id="explain"></p><p id="sparse"></p><p id="cellResidents" class="note"></p></div>
+<div class="history"><h3>Annual temperature</h3><p class="caption">°C above or below the 1951–1980 average</p><div class="chartkey"><span>Local</span><span>Global</span><span id="fitKey">Local fitted trend</span></div><canvas id="plot" role="img" aria-label="Annual temperature anomaly chart"></canvas><details><summary>See annual values</summary><div class="tablebox"><table><thead><tr><th>Year</th><th>Local (°C)</th><th>Global (°C)</th></tr></thead><tbody id="annual"></tbody></table></div></details></div>
+</section>
+</div>
+</div>
+
+<main class="shore">
+<section id="population" class="chapter" aria-labelledby="exposureHeading">
+<div class="chapterhead"><h2 id="exposureHeading">Who lives where it is warming faster than the world?</h2>
+<p id="exposureCaption">Loading 2020 population estimates…</p></div>
+<div id="exposureData" hidden>
 <figure class="populationBar"><figcaption>India’s residents in cells with a temperature trend</figcaption>
 <div class="populationTrack" aria-hidden="true"><span id="indiaFasterBar"></span></div>
 <div class="populationLabels"><span id="indiaFasterLabel"></span><span id="indiaOtherLabel"></span></div></figure>
+<div class="scrolltable"><table>
+<thead><tr><th scope="col">Area</th><th scope="col">Residents in faster-warming cells</th><th scope="col">Share of covered residents</th><th scope="col">Residents with a trend</th><th scope="col">Residents without a trend</th></tr></thead>
+<tbody id="exposureRows"></tbody></table></div>
 <details><summary>How the count and uncertainty work</summary>
 <p>We add the estimated 2020 residents of each 2° cell whose local warming rate exceeds the global rate. The percentage uses residents in cells with a complete trend. For India, we count only population pixels whose centres fall inside the mapped country boundary.</p>
-<p id="exposureIntervals"></p><p>These cell-by-cell intervals can be too narrow for short records. The population counts describe where people lived in 2020. Health outcomes require separate data.</p>
+<p id="exposureIntervals"></p><p>The global average includes the oceans, which cover most of the planet and warm more slowly than land. Because people live on land, many of them live in cells that warm faster than that average for this reason alone. The counts describe where people lived in 2020, not health effects.</p>
 </details></div></section>
-<section class="summary atlas"><h2>Regional comparison</h2><p id="comparisonCaption"></p><div class="scrolltable"><table><thead><tr><th scope="col">Region</th><th scope="col" id="timeHeading">Years fitted</th><th scope="col">Local</th><th scope="col">Global</th><th scope="col">Local − global</th></tr></thead><tbody id="comparison"></tbody></table></div><p id="comparisonNote" class="note"></p></section>
-<details class="method"><summary>How to read the trends and uncertainty</summary>
+
+<section class="chapter"><div class="chapterhead"><h2>Regions side by side</h2><p id="comparisonCaption"></p></div><div class="scrolltable"><table class="comparison"><thead><tr><th scope="col">Region</th><th scope="col" id="timeHeading">Years fitted</th><th scope="col">Local</th><th scope="col">Global</th><th scope="col">Local − global</th></tr></thead><tbody id="comparison"></tbody></table></div><p id="comparisonNote" class="note"></p></section>
+
+<section class="chapter water-teaser"><div class="chapterhead"><h2>Water after the monsoon</h2><p>NASA’s GRACE satellites weigh the water stored under northwest India. See how Rajasthan, Punjab, Haryana and Delhi fared after each rainy season since 2002.</p></div><a class="teaserlink" href="water/">Open the water explorer</a></section>
+
+<details class="method chapter"><summary>How to read the trends and uncertainty</summary>
 <p>Each trend is the slope of a straight line through annual temperatures relative to the 1951–1980 average. For the global comparison we fit the yearly local minus global differences. A negative difference means a place warmed more slowly than the world or cooled more quickly. The chart shows the two original histories.</p>
 <p>In the yearly view, each cell needs all 12 months in the selected year. For a trend it needs all 12 months in every year of the period. Gray marks missing estimates. Regional averages weight cells by area and require at least 80% coverage each month. If a region has gaps, its fitted line uses the uninterrupted record after the last gap. Its global comparison uses exactly those years.</p>
-<p>The 95% interval describes the fitted trend for the selected place. We account for similarities between nearby years using Newey–West standard errors with three annual lags. The interval excludes additional uncertainty in NASA’s temperature estimates. Map colors show estimated rates. Examining many locations can produce chance findings.</p>
+<p>The 95% interval describes the fitted trend for the selected place. We account for similarities between nearby years using Newey–West standard errors with three annual lags. The interval excludes additional uncertainty in NASA’s temperature estimates. Map colors show estimated rates. Examining many locations can produce chance findings. In tests on simulated records with no trend at all, intervals built this way excluded zero in roughly 10–14% of cases rather than 5%, so treat them as optimistic.</p>
 <p><b>Hatched cells.</b> NASA’s standard grid fills each cell from stations up to 1,200 km away. Hatched land cells are where NASA’s 250 km grid has data in fewer than half the months of the selected period. Ocean cells are not hatched. A cell counts as land when its centre lies inside the Natural Earth outline.</p></details>
-<footer><span>Temperature estimates · <a href="https://data.giss.nasa.gov/gistemp/">NASA GISS / GISTEMP v4</a></span><span>Coastlines · <a href="https://www.naturalearthdata.com/">Natural Earth</a></span></footer>
-</main></body></html>
+
+<footer><p>Built for the 2026 NASA Space Apps Challenge, “Be an Earth System Trend Detective!”</p><p>Temperature estimates from <a href="https://data.giss.nasa.gov/gistemp/">NASA GISS GISTEMP v4</a>. Coastlines from <a href="https://www.naturalearthdata.com/">Natural Earth</a>. Population from <a href="https://human-settlement.emergency.copernicus.eu/ghs_pop2023.php">GHS-POP 2020</a>.</p></footer>
+</main>
+</body></html>

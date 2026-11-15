@@ -26,7 +26,7 @@ function storyText(name) {
   const range = r => fmt(r.relative[1]) + " to " + fmt(r.relative[2]);
   if (name === "hole") {
     const na = r00["North Atlantic"], na80 = r80["North Atlantic"];
-    return "The warming hole. Since 1900 the ocean south of Greenland warmed " + fmt(na.stats[0]) +
+    return "Since 1900 the ocean south of Greenland warmed " + fmt(na.stats[0]) +
       " °C/decade while the world warmed " + fmt(na.globalRate) + ". That puts it " + fmt(na.relative[0]) +
       " °C/decade relative to the globe (95% interval " + range(na) + "). The ten most below-global cells on the 1900–2025 map all sit in this box. " +
       "Over 1980–2025 the same box is " + fmt(na80.relative[0]) + " (interval " + range(na80) +
@@ -34,12 +34,12 @@ function storyText(name) {
   }
   if (name === "arctic") {
     const a = r80.Arctic;
-    return "Arctic amplification. Since 1980 the Arctic warmed " + fmt(a.stats[0]) + " °C/decade, " +
+    return "Since 1980 the Arctic warmed " + fmt(a.stats[0]) + " °C/decade, " +
       (a.stats[0] / a.globalRate).toFixed(1) + "× the global " + fmt(a.globalRate) + ". The gap is " +
       fmt(a.relative[0]) + " °C/decade (95% interval " + range(a) + "). Same planet, same years, very different rates.";
   }
   const a = r00.Arctic, a80 = r80.Arctic;
-  return "Is amplification new? Fitted over " + a.fitStart + "–2025 (the Arctic record has a gap in " + (a.fitStart - 1) +
+  return "Fitted over " + a.fitStart + "–2025 (the Arctic record has a gap in " + (a.fitStart - 1) +
     "), the Arctic runs only " + fmt(a.relative[0]) + " °C/decade above the globe (interval " + range(a) + "), against " +
     fmt(a80.relative[0]) + " since 1980. The chart shows why: a warm Arctic spell in the 1930s–40s flattens the long-run line. " +
     "Most of the excess Arctic warming is recent.";
@@ -172,10 +172,10 @@ function drawSeries(values) {
   const lo=Math.floor(Math.min(0,...valid)), hi=Math.max(lo+1,Math.ceil(Math.max(0,...valid)));
   const left=29,right=w-8,top=12,bottom=h-19;
   const y=v=>bottom-(v-lo)/(hi-lo)*(bottom-top);
-  ctx.font="11px monospace";ctx.fillStyle="#4b6057";ctx.textAlign="right";
+  ctx.font='12px "Schibsted Grotesk", sans-serif';ctx.fillStyle="#56697b";ctx.textAlign="right";
   for (const tick of new Set([lo,0,hi])) {
     ctx.fillText(tick,left-5,y(tick)+3);ctx.beginPath();ctx.moveTo(left,y(tick));ctx.lineTo(right,y(tick));
-    ctx.strokeStyle=tick===0?"#98a69c":"#dee3db";ctx.lineWidth=1;ctx.stroke();
+    ctx.strokeStyle=tick===0?"#8a9cab":"#e1e8ed";ctx.lineWidth=1;ctx.stroke();
   }
   function line(points, color, dashed = false) {
     ctx.beginPath();
@@ -190,9 +190,9 @@ function drawSeries(values) {
     });
     ctx.stroke();
   }
-  line(period.series, "#99683a");
-  line(values, "#275d50");
-  if (fitLine) line(fitLine.values, "#263632", true);
+  line(period.series, "#d0794f");
+  line(values, "#1d5f86");
+  if (fitLine) line(fitLine.values, "#12263a", true);
   ctx.setLineDash([]);
   if (byYear) {
     const index = selectedYear - firstYear;
@@ -200,11 +200,11 @@ function drawSeries(values) {
     ctx.strokeStyle = "#505952";
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(x,top); ctx.lineTo(x,bottom); ctx.stroke();
-    for (const [v, color] of [[period.series[index], "#99683a"], [values[index], "#275d50"]]) {
+    for (const [v, color] of [[period.series[index], "#d0794f"], [values[index], "#1d5f86"]]) {
       if (!Number.isFinite(v)) continue;
       ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x,y(v),4,0,2*Math.PI); ctx.fill();
     }
-    ctx.fillStyle = "#22352f";
+    ctx.fillStyle = "#12263a";
     ctx.textAlign = "center";
     ctx.fillText(String(selectedYear),clamp(x,left+14,right-14),top-2);
   }
@@ -303,11 +303,11 @@ function showTrendDetails(stats, relative, fitStart, globalRate, cell) {
   $("interval").textContent = valid ? "95% interval: " + changeText(low*scale) + " to " + changeText(high*scale) + units + "." : "";
   let interpretation = "The record is incomplete for this period.";
   if (valid && showGap) {
-    interpretation = low > 0 ? "The local trend is above the global trend." :
-      high < 0 ? "The local trend is below the global trend." : "The interval includes zero. The trends cannot be distinguished here.";
+    interpretation = low > 0 ? "The fitted interval suggests faster warming than the globe." :
+      high < 0 ? "The fitted interval suggests slower warming than the globe." : "The interval includes zero. The trends cannot be distinguished here.";
   } else if (valid) {
-    interpretation = low > 0 ? "The interval supports warming here." :
-      high < 0 ? "The interval supports cooling here." : "The interval includes zero. The direction is uncertain.";
+    interpretation = low > 0 ? "The fitted interval suggests warming here." :
+      high < 0 ? "The fitted interval suggests cooling here." : "The interval includes zero. The direction is uncertain.";
   }
   $("explain").textContent = interpretation;
   $("sparse").textContent = cell !== undefined && coverage[cell] ?
@@ -505,9 +505,7 @@ function showExposure() {
   $("indiaFasterBar").style.width = share + "%";
   $("indiaFasterLabel").textContent = share.toFixed(1) + "% faster than global";
   $("indiaOtherLabel").textContent = (100 - share).toFixed(1) + "% at or below global";
-  $("exposureIntervals").textContent = "A stricter check counts only cells whose local-minus-global trend has a 95% interval entirely above zero. This includes " +
-    people.format(groups.india.aboveInterval) + " residents in India and " + people.format(groups.world.aboveInterval) +
-    " worldwide. Each interval applies to one cell. The counts have no map-wide significance adjustment.";
+  $("exposureIntervals").textContent = "";
 }
 
 function render(reveal = false) {
@@ -630,3 +628,6 @@ async function load() {
   await selectPeriod(firstYear);
 }
 load().catch(() => { $("status").textContent = "The map data could not load. Reload the page to try again."; });
+
+// Redraw once the web font arrives so chart labels use it.
+if (document.fonts) document.fonts.ready.then(() => { if (cells) render(); });
