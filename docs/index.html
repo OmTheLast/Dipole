@@ -8,22 +8,56 @@
 <title>Dipole · Same planet, opposite trends</title>
 <meta name="description" content="Explore how surface temperature changed at every place on Earth since 1900, using NASA’s GISTEMP record.">
 <link rel="preload" href="fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="map/style.css?v=motion-1">
+<link rel="stylesheet" href="map/style.css?v=city-location-1">
 <script src="map/player.js?v=2" defer></script>
-<script src="map/app.js?v=local-area-1" defer></script>
-<script src="map/location.js?v=local-area-1" defer></script>
-<script src="map/tour.js?v=motion-1" defer></script>
+<script src="map/app.js?v=first-view-1" defer></script>
+<script src="map/location.js?v=city-location-1" defer></script>
+<script src="map/tour.js?v=phone-guide-1" defer></script>
 </head>
-<body>
+<body class="temperature">
+<main>
 <div class="deep">
 <header class="top"><a class="brand" href="./"><span class="brandmark" aria-hidden="true"></span>Dipole</a><nav aria-label="Project"><a href="./" aria-current="page">Temperature</a><a href="water/">Water</a><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources</a><a href="https://github.com/OmTheLast/Dipole">GitHub</a></nav></header>
 
 <section class="hero">
-<h1>Same planet,<br>opposite trends.</h1>
-<div><p class="lede">Earth has warmed overall, but places warm at different rates. A dipole has two contrasting sides. Here, we compare places that warmed faster than the world, like the Arctic, with places that lagged behind, like the ocean south of Greenland.</p>
+<h1>Same planet, <br>opposite trends.</h1>
+<div><p class="lede">The Arctic warmed faster than the world. The ocean south of Greenland warmed much more slowly. Select a grid square to see how its temperature changed.</p>
 <button class="action" id="restartTour" type="button">Take the guided tour</button></div>
 </section>
 
+<div id="scrubber" hidden><label for="year">Year <output id="yearValue" for="year">2015</output></label>
+<div class="yeartrack"><button class="action play" id="playYears" type="button">Play</button><span id="startLabel">1980</span><input id="year" type="range" min="1980" max="2025" step="1" value="2015"><span>2025</span></div></div>
+<p id="status" role="status">Loading NASA temperature estimates…</p>
+
+<div class="workspace">
+<section class="atlas" aria-label="Global temperature map">
+<div class="maptools" role="group" aria-label="Map navigation">
+<button id="zoomOut" aria-label="Zoom out" disabled>−</button><output id="zoomLevel" aria-label="Map zoom">1×</output><button id="zoomIn" aria-label="Zoom in" disabled>+</button>
+<button id="worldView" disabled>Whole world</button><span id="mapHint">Tap a grid square or use the arrow keys. Scroll to zoom and drag to explore.</span>
+</div>
+<div class="maparea"><canvas id="map" tabindex="0" aria-describedby="mapHint" aria-label="World temperature map"></canvas><div id="cellTip" hidden></div></div>
+<div id="mapReading" aria-live="polite" hidden><strong id="readingPlace"></strong><span id="readingText"></span> <a href="#details">See the evidence ↓</a></div>
+<div class="legend"><div class="legendscale"><span class="legendtitle"><span id="legendText">Temperature trend</span> <span id="legendUnits">°C / decade</span></span><div class="scale"><div class="gradient"></div><div class="ticks"><span id="scaleLow">≤ −1</span><span>0</span><span id="scaleHigh">≥ +1</span></div></div></div><span class="missing"><i></i> <span id="missingLabel">Incomplete record</span></span><span id="overlayKey" class="overlaykey"><span class="hatchkey"><i></i> 250 km grid has data in fewer than half the months</span></span></div>
+<div class="controls">
+<fieldset id="views" class="segmented" disabled><legend>View</legend><button data-view="trend" aria-pressed="true">Trend</button><button data-view="annual" aria-pressed="false">By year</button></fieldset>
+<fieldset id="periods" class="segmented" disabled><legend>Period</legend><button data-start="1900" aria-pressed="true">1900–2025</button><button data-start="1980" aria-pressed="false">1980–2025</button></fieldset>
+<fieldset id="modes" class="segmented" disabled><legend>Colour by</legend><button data-mode="absolute" aria-pressed="false">Local warming rate</button><button data-mode="relative" aria-pressed="true">Compared with the world</button></fieldset>
+</div>
+<details class="layers"><summary>Map layers</summary><div id="populationMap" class="layerControls">
+<label for="mapPopulation">2020 population overlay</label>
+<select id="mapPopulation" disabled><option value="">Off</option><option value="world">World</option><optgroup label="Country or territory" id="layerCountries"></optgroup></select>
+<a href="#population">Compare counts with the world ↓</a>
+<div id="populationKey" hidden><p id="layerCaption"></p>
+<div class="dotKey" aria-label="Dot size by residents per two-degree grid square"><span><i></i>Under 100k</span><span><i></i>100k–&lt;1M</span><span><i></i>1M–&lt;10M</span><span><i></i>10M+</span></div>
+</div>
+<div class="sigControl"><label><input type="checkbox" id="sigToggle" disabled> Show significance crosses (×)</label>
+<span id="sigCaption" role="status"></span></div>
+</div>
+</details>
+<div class="locations"><div class="presets" id="presets"><span class="presetlabel">Jump to</span>
+<button data-region="Arctic">Arctic</button><button data-region="North Atlantic">North Atlantic</button></div>
+<div class="cityLookup" role="group" aria-labelledby="cityLabel"><label id="cityLabel" for="city">Find a city</label><select id="city" disabled><option value="">Choose a city</option><option value="13.7519,100.5147">Bangkok</option><option value="39.9017,116.3942">Beijing</option><option value="-34.6107,-58.4325">Buenos Aires</option><option value="30.0519,31.2480">Cairo</option><option value="-33.9181,18.4330">Cape Town</option><option value="-6.1725,106.8275">Jakarta</option><option value="6.4452,3.3896">Lagos</option><option value="51.5019,-0.1187">London</option><option value="19.4444,-99.1329">Mexico City</option><option value="19.0684,72.8758">Mumbai</option><option value="-1.2814,36.8147">Nairobi</option><option value="28.6000,77.2000">New Delhi</option><option value="40.7216,-73.9957">New York</option><option value="48.8581,2.3530">Paris</option><option value="-22.9073,-43.2121">Rio de Janeiro</option><option value="1.2950,103.8539">Singapore</option><option value="-33.8714,151.2125">Sydney</option><option value="-23.5567,-46.6270">São Paulo</option><option value="35.6870,139.7495">Tokyo</option></select><button class="action" type="button" id="geoMap" disabled>Use my location</button><small id="areaStatus" role="status"></small></div>
+<details class="coordinateLookup"><summary>Find a grid square by coordinates</summary><form id="coords"><label>Latitude<input type="number" name="lat" required min="-90" max="90" step="any" placeholder="−90 to 90"></label><label>Longitude<input type="number" name="lon" required min="-180" max="180" step="any" placeholder="−180 to 180"></label><button type="submit">Show grid square</button></form></details></div>
 <fieldset id="cases" class="cases" disabled><legend class="visually-hidden">Start with a finding</legend>
 <button data-case="hole" aria-pressed="true"><b>Did the North Atlantic keep pace?</b><small>North Atlantic, since 1900</small></button>
 <button data-case="arctic" aria-pressed="false"><b>How fast did the Arctic warm?</b><small>Arctic, since 1980</small></button>
@@ -31,79 +65,47 @@
 </fieldset>
 <p id="story" class="story"></p>
 
-<div class="controls">
-<fieldset id="views" class="segmented" disabled><legend>View</legend><button data-view="trend" aria-pressed="true">Trend</button><button data-view="annual" aria-pressed="false">By year</button></fieldset>
-<fieldset id="periods" class="segmented" disabled><legend>Period</legend><button data-start="1900" aria-pressed="true">1900–2025</button><button data-start="1980" aria-pressed="false">1980–2025</button></fieldset>
-<fieldset id="modes" class="segmented" disabled><legend>Colour by</legend><button data-mode="absolute" aria-pressed="false">Local warming rate</button><button data-mode="relative" aria-pressed="true">Compared with the world</button></fieldset>
-</div>
-<div id="scrubber" hidden><label for="year">Year <output id="yearValue" for="year">2015</output></label>
-<div class="yeartrack"><button class="action play" id="playYears" type="button">Play</button><span id="startLabel">1980</span><input id="year" type="range" min="1980" max="2025" step="1" value="2015"><span>2025</span></div></div>
-<p id="status" role="status">Loading NASA temperature estimates…</p>
-
-<div class="workspace">
-<section class="atlas" aria-label="Global temperature map">
-<details class="layers"><summary>Map layers</summary><div id="populationMap" class="layerControls">
-<label for="mapPopulation">2020 population overlay</label>
-<select id="mapPopulation" disabled><option value="">Off</option><option value="world">World</option><optgroup label="Country or territory" id="layerCountries"></optgroup></select>
-<a href="#population">Compare counts with the world ↓</a>
-<div id="populationKey" hidden><p id="layerCaption"></p>
-<div class="dotKey" aria-label="Dot size by residents per two-degree cell"><span><i></i>Under 100k</span><span><i></i>100k–&lt;1M</span><span><i></i>1M–&lt;10M</span><span><i></i>10M+</span></div>
-</div>
-<div class="sigControl"><label><input type="checkbox" id="sigToggle" disabled> Show significance crosses (×)</label>
-<span id="sigCaption" role="status"></span></div>
-</div>
-</details>
-<div class="maptools" role="group" aria-label="Map navigation">
-<button id="zoomOut" aria-label="Zoom out" disabled>−</button><output id="zoomLevel" aria-label="Map zoom">1×</output><button id="zoomIn" aria-label="Zoom in" disabled>+</button>
-<button id="worldView" disabled>Whole world</button><span id="mapHint">Scroll over the map to zoom. Drag to explore, or tap a square to read its result.</span>
-</div>
-<div class="maparea"><canvas id="map" tabindex="0" aria-describedby="mapHint" aria-label="World temperature map"></canvas><div id="cellTip" hidden></div></div>
-<div id="mapReading" aria-live="polite" hidden><strong id="readingPlace"></strong><span id="readingText"></span> <a href="#details">See the evidence ↓</a></div>
-<div class="legend"><div class="legendscale"><span class="legendtitle"><span id="legendText">Temperature trend</span> <span id="legendUnits">°C / decade</span></span><div class="scale"><div class="gradient"></div><div class="ticks"><span id="scaleLow">≤ −1</span><span>0</span><span id="scaleHigh">≥ +1</span></div></div></div><span class="missing"><i></i> <span id="missingLabel">Incomplete record</span></span><span id="overlayKey" class="overlaykey"><span class="hatchkey"><i></i> 250 km grid has data in fewer than half the months</span></span></div>
-<div class="locations"><div class="presets" id="presets"><span class="presetlabel">Jump to</span>
-<button data-region="Arctic">Arctic</button><button data-region="North Atlantic">North Atlantic</button><button type="button" id="geoMap" disabled>My area</button><small id="areaStatus" role="status"></small></div>
-<details class="coordinateLookup"><summary>Find a cell by coordinates</summary><form id="coords"><label>Latitude<input type="number" name="lat" required min="-90" max="90" step="any" placeholder="−90 to 90"></label><label>Longitude<input type="number" name="lon" required min="-180" max="180" step="any" placeholder="−180 to 180"></label><button type="submit">Show cell</button></form></details></div>
 </section>
 
 <section class="inspector" aria-label="Selected location">
 <p id="kind" class="kind">Region</p>
-<div id="details" aria-live="polite"><p class="q">Where</p><h2 id="name">Arctic</h2><p id="bounds"></p><p id="coverage"></p><p class="q">What changed, and by how much</p><p class="metriclabel" id="metricLabel">Estimated change</p><div id="change">…</div><p id="rate"></p><p id="reference"></p><p class="q">How certain</p><p id="interval"></p><p id="explain"></p><p id="cellSig" class="note"></p><p id="sparse"></p><p id="cellResidents" class="note"></p></div>
-<div class="history"><h3>Annual temperature</h3><p class="caption">°C above or below the 1951–1980 average</p><div class="chartkey"><span>Local</span><span>Global</span><span id="fitKey">Local fitted trend</span></div><canvas id="plot" role="img" aria-label="Annual temperature anomaly chart"></canvas><details><summary>See annual values</summary><div class="tablebox"><table><thead><tr><th>Year</th><th>Local (°C)</th><th>Global (°C)</th></tr></thead><tbody id="annual"></tbody></table></div></details></div>
+<div id="details" aria-live="polite"><p class="q">Where</p><h2 id="name">Arctic</h2><p id="detailAnswer"></p><p id="bounds"></p><p id="coverage"></p><p class="q">What changed, and by how much</p><p class="metriclabel" id="metricLabel">Estimated change</p><div id="change">…</div><p id="rate"></p><p id="reference"></p><p class="q" id="certaintyHeading">How certain is the trend?</p><p id="interval"></p><p id="explain"></p><p id="cellSig" class="note"></p><p id="sparse"></p><p id="cellResidents" class="note"></p></div>
+<div class="history"><h3>Annual temperature</h3><p class="caption">°C above or below the 1951–1980 average</p><div class="chartkey"><span>Local</span><span>Global</span><span id="fitKey">Local fitted trend</span></div><canvas id="plot" role="img" aria-label="Annual temperature anomaly chart"></canvas><details><summary>See annual values</summary><div class="tablebox" tabindex="0" role="region" aria-label="Yearly temperatures"><table><thead><tr><th>Year</th><th>Local (°C)</th><th>Global (°C)</th></tr></thead><tbody id="annual"></tbody></table></div></details></div>
 </section>
 </div>
 </div>
 
-<main class="shore">
+<div class="shore">
 <section id="population" class="chapter" aria-labelledby="exposureHeading">
-<div class="chapterhead"><h2 id="exposureHeading">Who lives where it is warming faster than the world?</h2>
+<div class="chapterhead"><h2 id="exposureHeading">Who lived in places that warmed faster than the world?</h2>
 <p id="exposureCaption">Loading 2020 population estimates…</p></div>
 <div id="exposureData" hidden>
 <label class="populationCountry" for="exposureCountry">Country or territory <select id="exposureCountry"></select></label>
 <button id="showCountryLayer" type="button" disabled>Show selected country on the map ↑</button>
 <button type="button" id="geoCountry" disabled>Use my location</button>
-<p id="geoStatus" role="status">Use your location to select your country and zoom to your temperature cell. Your coordinates stay on this device.</p>
+<p id="geoStatus" role="status">Use your location to select your country and zoom to your temperature grid square. Your coordinates stay on this device.</p>
 <figure class="populationBar"><figcaption id="countryBarCaption"></figcaption>
 <div class="populationTrack" aria-hidden="true"><span id="countryFasterBar"></span></div>
 <div class="populationLabels"><span id="countryFasterLabel"></span><span id="countryOtherLabel"></span></div></figure>
-<div class="scrolltable"><table>
-<thead><tr><th scope="col">Area</th><th scope="col">Residents in faster-warming cells</th><th scope="col">Share of covered residents</th><th scope="col">Residents with a trend</th><th scope="col">Residents without a trend</th></tr></thead>
+<div class="scrolltable" tabindex="0" role="region" aria-label="Population by country and world"><table>
+<thead><tr><th scope="col">Area</th><th scope="col">Residents in faster-warming grid squares</th><th scope="col">Share of covered residents</th><th scope="col">Residents with a trend</th><th scope="col">Residents without a trend</th></tr></thead>
 <tbody id="exposureRows"></tbody></table></div>
 <details><summary>How the count and uncertainty work</summary>
-<p>We add the estimated 2020 residents of each 2° cell whose local warming rate exceeds the global rate. The percentage uses residents in cells with a complete trend. For a country or territory, we count only population pixels whose centres fall inside the mapped country boundary.</p>
-<p id="exposureIntervals"></p><p>The global average includes the oceans, which cover most of the planet and warm more slowly than land. Because people live on land, many of them live in cells that warm faster than that average for this reason alone. The counts describe where people lived in 2020, not health effects.</p>
+<p>We count the people who lived in each 2° grid square in 2020. We then calculate the share living in squares that warmed faster than the world over the selected period. The percentage uses only squares with a complete temperature record. For a country or territory, we count only population pixels whose centres fall inside the mapped country boundary.</p>
+<p id="exposureIntervals"></p><p>The global average includes the oceans, which cover most of the planet and warm more slowly than land. Because people live on land, many of them live in grid squares that warm faster than that average for this reason alone. The counts describe where people lived in 2020, not health effects.</p>
 </details></div></section>
 
-<section class="chapter"><div class="chapterhead"><h2>Regions side by side</h2><p id="comparisonCaption"></p></div><div class="scrolltable"><table class="comparison"><thead><tr><th scope="col">Region</th><th scope="col" id="timeHeading">Years fitted</th><th scope="col">Local</th><th scope="col">Global</th><th scope="col">Local − global</th></tr></thead><tbody id="comparison"></tbody></table></div><p id="comparisonNote" class="note"></p></section>
+<section class="chapter"><div class="chapterhead"><h2>Regions side by side</h2><p id="comparisonCaption"></p></div><div class="scrolltable" tabindex="0" role="region" aria-label="Regional and world temperature comparison"><table class="comparison"><thead><tr><th scope="col">Region</th><th scope="col" id="timeHeading">Years fitted</th><th scope="col">Local</th><th scope="col">Global</th><th scope="col">Local − global</th></tr></thead><tbody id="comparison"></tbody></table></div><p id="comparisonNote" class="note"></p></section>
 
 <section class="chapter water-teaser" id="waterIntro"><div class="chapterhead"><h2>Water after the monsoon</h2><p>The temperature map asks which places warmed faster than the world. Water gives us a different comparison: after the rains, did northwest India and its neighbours hold more or less water than usual? Compare both regions over the same monsoon years.</p></div><a class="teaserlink" href="water/">Open the water explorer</a></section>
 
 <details class="method chapter"><summary>How to read the trends and uncertainty</summary>
-<p>Each trend is the slope of a straight line through annual temperatures relative to the 1951–1980 average. For the global comparison we fit the yearly local minus global differences. A negative difference means a place warmed more slowly than the world or cooled more quickly. The chart shows the two original histories.</p>
-<p>In the yearly view, each cell needs all 12 months in the selected year. For a trend it needs all 12 months in every year of the period. Gray marks missing estimates. Regional averages weight cells by area and require at least 80% coverage each month. If a region has gaps, its fitted line uses the uninterrupted record after the last gap. Its global comparison uses exactly those years.</p>
-<p>The 95% interval describes the fitted trend for the selected place. We account for similarities between nearby years using Newey–West standard errors with three annual lags. The interval excludes additional uncertainty in NASA’s temperature estimates. Map colors show estimated rates. Examining many locations can produce chance findings. In tests on simulated records with no trend at all, intervals built this way excluded zero in roughly 10–14% of cases rather than 5%, so treat them as optimistic.</p>
-<p><b>Significance crosses.</b> Each cross marks a cell whose trend passes a two-sided Benjamini–Hochberg check at a 5% false discovery rate. We test all cells with complete records together, separately for each period and map mode. The local map tests for change over time. The relative map tests for a difference from global warming. A cell can have a trend without earning a cross. Nearby cells share measurements, so clusters of crosses do not count as independent observations.</p>
-<p><b>Hatched cells.</b> NASA’s standard grid fills each cell from stations up to 1,200 km away. Hatched land cells are where NASA’s 250 km grid has data in fewer than half the months of the selected period. Ocean cells are not hatched. A cell counts as land when its centre lies inside the Natural Earth outline.</p></details>
+<p><b>Warming rate.</b> We fit a straight line to yearly temperatures measured against the 1951–1980 average. To compare a place with the world, we fit a line to the difference between their readings each year. A negative difference means a place warmed more slowly than the world or cooled more quickly. The chart shows the two original histories.</p>
+<p><b>Missing observations.</b> In the yearly view, each grid square needs all 12 months in the selected year. For a trend it needs all 12 months in every year of the period. Grey marks missing estimates. Regional averages weight grid squares by area and require at least 80% coverage each month. If a region has gaps, its fitted line uses the uninterrupted record after the last gap. Its global comparison uses exactly those years.</p>
+<p><b>Uncertainty.</b> The 95% interval describes the fitted trend for the selected place. Nearby years often have similar temperatures. We allow for that using Newey–West standard errors with three yearly lags. The interval excludes additional uncertainty in NASA’s temperature estimates. Map colours show estimated rates. Examining many locations can produce chance findings. In tests on simulated records with no trend at all, intervals built this way excluded zero in roughly 10–14% of cases rather than 5%, so treat them as optimistic.</p>
+<p><b>Significance crosses.</b> Each cross marks a grid square whose trend passes a two-sided Benjamini–Hochberg check at a 5% false discovery rate. We test all grid squares with complete records together, separately for each period and map mode. The local map tests for change over time. The relative map tests for a difference from global warming. A grid square can have a trend without earning a cross. Nearby squares share measurements, so clusters of crosses do not count as independent observations.</p>
+<p><b>Hatched squares.</b> NASA’s standard grid fills each grid square from stations up to 1,200 km away. Hatching marks land squares where NASA’s 250 km grid has data in fewer than half the months of the selected period. Ocean squares are not hatched. A grid square counts as land when its centre lies inside the Natural Earth outline.</p></details>
 
 <footer><p>Built for the 2026 NASA Space Apps Challenge, “Be an Earth System Trend Detective!”</p><p>Temperature estimates from <a href="https://data.giss.nasa.gov/gistemp/">NASA GISS GISTEMP v4</a>. Coastlines from <a href="https://www.naturalearthdata.com/">Natural Earth</a>. Population from <a href="https://human-settlement.emergency.copernicus.eu/ghs_pop2023.php">GHS-POP 2020</a>.</p></footer>
-</main>
+</div></main>
 </body></html>

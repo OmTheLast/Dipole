@@ -31,9 +31,10 @@ async function loadWater() {
     markChart();
     map?.setYear(season);
     const other = season[selector.value].mean;
+    const direction = value => value === 0 ? "its usual amount of water" : value > 0 ? "more water than usual" : "less water than usual";
     node("waterReading").textContent = season.mean === null || other === null
       ? season.year + " · Incomplete season. Open the table below to see which months were observed."
-      : season.year + " · Northwest India " + number(season.mean) + " cm · " + pair().name + " " + number(other) + " cm. Each reading is relative to that region’s own average.";
+      : "In " + season.year + ", northwest India held " + direction(season.mean) + " and " + pair().name + " held " + direction(other) + ". Northwest India " + number(season.mean) + " cm · " + pair().name + " " + number(other) + " cm. Each reading is relative to that region’s 2004–2009 average.";
   }
   function setView() {
     const view = node("waterView").value;

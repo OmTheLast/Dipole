@@ -195,7 +195,7 @@ footer { display: grid; gap: 4px; padding: 32px 0 48px; border-top: 1px solid va
 @media (max-width: 640px) {
   .top { height: 60px }
   .top nav { gap: 12px; font-size: 13px }
-  .top nav a[href*=sources] { display: none }
+
   .cases { grid-template-columns: 1fr }
   .cases button { padding: 11px 14px }
   .segmented legend { float: none; display: block; margin-bottom: 4px }
@@ -253,3 +253,47 @@ footer { display: grid; gap: 4px; padding: 32px 0 48px; border-top: 1px solid va
 #map {cursor:grab;touch-action:pan-y}
 #map.zoomed {touch-action:none}
 #map.dragging {cursor:grabbing}
+
+/* Put the result within reach of the map on a first visit. */
+.temperature .hero {padding:16px 0 22px;gap:18px 34px;grid-template-columns:1fr 1.2fr}
+.temperature .hero h1 {font-size:clamp(38px,4.4vw,66px)}
+.temperature .hero .lede {font-size:16px;max-width:58ch;line-height:1.4}
+.temperature #restartTour {margin-top:8px}
+.atlas .controls {margin:18px 0 10px}
+.atlas .cases {margin-top:18px}
+.cityLookup {display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:14px;max-width:100%}
+.cityLookup .action {background:var(--ice);color:var(--ocean)}
+.cityLookup #areaStatus:not(:empty) {flex-basis:100%}
+.cityLookup #areaStatus:empty {display:none}
+.cityLookup select {padding:6px;border-radius:6px;font:inherit}
+#detailAnswer {font-weight:650;margin:8px 0}
+@media(max-width:640px){
+  .temperature .hero {display:block;padding:5px 0 12px}
+  .temperature .hero h1 {font-size:clamp(29px,7.6vw,42px);line-height:1.1}
+  .temperature .hero h1 br {display:none}
+  .temperature .hero .lede {margin-top:5px;font-size:14px}
+  .top {height:auto;min-height:48px;flex-wrap:wrap;gap:4px 8px}
+  .temperature .maptools {gap:4px;margin-bottom:5px}
+  #mapHint {margin-left:0}
+  #mapReading {margin-top:6px}
+  .atlas .cases {grid-template-columns:1fr}
+}
+
+.guide .guideHint, .guide .guideMore {display:none}
+@media(max-width:640px) {
+  .guide {position:relative;z-index:1;width:100%;max-height:none;overflow:visible;margin:14px 0;
+    padding:8px 12px 5px;text-align:left;grid-column:1 / -1;color:var(--ink);box-shadow:none}
+  body[data-touring] #scrubber {margin-bottom:6px;padding:6px 12px}
+  .guide small {display:inline-block;margin-right:7px;font-size:12px}
+  .guide h2 {display:inline;margin:0;font-size:16px;line-height:1.4}
+  .guide .guideHint {display:inline}
+  .guide .guideFullTitle,.guide:not([data-expanded]) #guideText {display:none}
+  .guide #guideText {margin:6px 0;line-height:1.45;font-size:15px}
+  .guideActions {display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin:2px 0 0;gap:2px}
+  .guide .guideMore {display:inline-flex}
+  .guide .guideActions button {min-height:44px;min-width:0;margin-left:0;padding:3px 2px;font-size:14px}
+  .guide .guideActions .secondary {border-color:transparent}
+  .guide[data-side]::after {width:10px;height:10px}
+  .guide[data-side="above"]::after {bottom:-6px}
+  .guide[data-side="below"]::after {top:-6px}
+}

@@ -28,6 +28,7 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 | Central Ground Water Board, Dynamic Ground Water Resources of Madhya Pradesh 2024, section 3.1 | https://cgwb.gov.in/cgwbpnm/public/uploads/documents/1743585614534718415file.pdf | Identifies the October–November post-monsoon window used in the original Madhya Pradesh comparison. |
 | Rodell et al. (2009), Satellite-based estimates of groundwater depletion in India | https://doi.org/10.1038/nature08238 | Defines the four-area study region. Dipole estimates total water storage. |
 | Gravity Toolkit mission-month documentation | https://gravity-toolkit.readthedocs.io/en/stable/api_reference/time.html | Identifies shifted observation dates for the December 2011 and May 2015 nominal mission months. |
+| Natural Earth, 1:110m populated places v5.1.2 | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_110m_populated_places_simple.geojson | City coordinates for the temperature map’s city selector. Each city opens its containing 2° grid square. |
 | Natural Earth, 1:110m land polygons | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_110m_land.geojson | Public-domain coastline geometry used to orient visitors on the clickable world map. Retrieved 14 November 2026. |
 | European Commission, GHS-POP R2023A, 2020 residential population | https://human-settlement.emergency.copernicus.eu/ghs_pop2023.php | Counts of estimated residents at 30 arc-seconds, summed into Dipole’s 2° cells. Retrieved 14 November 2026. |
 | Natural Earth, 1:10m country boundaries v5.1.2 | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_10m_admin_0_countries.geojson | Country and territory boundaries select population pixels by their centres and match an optional browser location to a country locally. |
@@ -39,6 +40,7 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 | statsmodels | https://www.statsmodels.org/ | Fitted temperature trends and estimated confidence intervals that account for similarities between nearby years. |
 | SciPy | https://scipy.org/ | Independently read the source grid and checked the trend calculations. |
 | SciPy, false discovery control | https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.false_discovery_control.html | Adjusted the cell trend tests for the significance overlay. |
+| axe-core 4.10.2 | https://github.com/dequelabs/axe-core/tree/v4.10.2 | Checked the temperature and water pages for automated accessibility findings at desktop and phone widths. |
 | Matplotlib | https://matplotlib.org/ | Drew the two-line chart from Dipole’s annual data. |
 
 ## AI use and planning references

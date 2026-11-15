@@ -11,6 +11,7 @@
   }
   function selectCell(lat, lon, reveal) {
     const cell = cellAt(lat, lon);
+    privateLocationCell = cell;
     show({cell}, false);
     setZoom(4);
     const row = Math.floor(cell / cols), col = cell % cols;
@@ -26,7 +27,7 @@
     if (event.target.closest("#map, [data-region], #cases button, .guide button")) revision++;
   });
   $("coords").addEventListener("submit", () => revision++);
-  for (const id of ["exposureCountry", "mapPopulation"]) {
+  for (const id of ["city", "exposureCountry", "mapPopulation"]) {
     $(id).addEventListener("change", () => revision++);
   }
   function insideRing(x, y, ring) {
@@ -53,7 +54,7 @@
       const {longitude:x, latitude:y} = coords;
       const moveMap = cells && (explicit || (!document.querySelector(".guideTarget") && !location.hash && !entry.size));
       if (moveMap) selectCell(y, x, explicit);
-      const mapNote = moveMap ? "Selected the 2° temperature cell near you. " : "";
+      const mapNote = moveMap ? "Selected the 2° temperature grid square near you. " : "";
       try {
         if (!geography) {
           const response = await fetch("map/country-outlines.json");
