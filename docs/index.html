@@ -8,7 +8,7 @@
 <title>Dipole · Same planet, opposite trends</title>
 <meta name="description" content="Explore how surface temperature changed at every place on Earth since 1900, using NASA’s GISTEMP record.">
 <link rel="preload" href="fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="map/style.css?v=byline-2">
+<link rel="stylesheet" href="map/style.css?v=si-note-1">
 <script src="map/player.js?v=2" defer></script>
 <script src="map/app.js?v=rate-key-1" defer></script>
 <script src="map/location.js?v=city-location-1" defer></script>
@@ -18,7 +18,7 @@
 <main>
 <div class="deep">
 <header class="top"><div class="project-credit"><a class="brand" href="./"><span class="brandmark" aria-hidden="true"></span>Dipole</a>
-<p class="byline">By Om Patnaik and Vihaan Vajpeyi</p></div><nav aria-label="Project"><a href="./" aria-current="page">Temperature</a><a href="water/">Water</a><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources</a><a href="https://github.com/OmTheLast/Dipole">GitHub</a></nav></header>
+<p class="byline">By Om Patnaik and Vihaan Vajpeyi</p></div><nav aria-label="Project"><a href="./" aria-current="page">Temperature</a><a href="water/">Water</a><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Data sources</a><a href="https://github.com/OmTheLast/Dipole">GitHub</a></nav></header>
 
 <section class="hero">
 <h1>Same planet, <br>opposite trends.</h1>
@@ -107,6 +107,8 @@
 <p><b>Significance crosses.</b> Each cross marks a grid square whose trend passes a two-sided Benjamini–Hochberg check at a 5% false discovery rate. We test all grid squares with complete records together, separately for each period and map mode. The local map tests for change over time. The relative map tests for a difference from global warming. A grid square can have a trend without earning a cross. Nearby squares share measurements, so clusters of crosses do not count as independent observations.</p>
 <p><b>Hatched squares.</b> NASA’s standard grid fills each grid square from stations up to 1,200 km away. Hatching marks land squares where NASA’s 250 km grid has data in fewer than half the months of the selected period. Ocean squares are not hatched. A grid square counts as land when its centre lies inside the Natural Earth outline.</p></details>
 
-<footer><p>Built for the 2026 NASA Space Apps Challenge, “Be an Earth System Trend Detective!”</p><p>Temperature estimates from <a href="https://data.giss.nasa.gov/gistemp/">NASA GISS GISTEMP v4</a>. Coastlines from <a href="https://www.naturalearthdata.com/">Natural Earth</a>. Population from <a href="https://human-settlement.emergency.copernicus.eu/ghs_pop2023.php">GHS-POP 2020</a>.</p></footer>
+<footer><p>Built for the 2026 NASA Space Apps Challenge, “Be an Earth System Trend Detective!”</p><p>Temperature estimates from <a href="https://data.giss.nasa.gov/gistemp/">NASA GISS GISTEMP v4</a>. Coastlines from <a href="https://www.naturalearthdata.com/">Natural Earth</a>. Population from <a href="https://human-settlement.emergency.copernicus.eu/ghs_pop2023.php">GHS-POP 2020</a>.</p>
+<section id="si-use" aria-labelledby="si-heading"><h2 id="si-heading">How we used Super Intelligence (SI) tools</h2>
+<p>Our team used Codex and Claude to research data sources, organize the repository, write and debug code, prepare documentation, and generate the demo. We reviewed all SI-generated code before using it in Dipole. These tools helped us work faster and gave us more time to check and refine the project.</p></section></footer>
 </div></main>
 </body></html>

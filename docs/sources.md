@@ -1,6 +1,6 @@
-# Dipole submission sources
+# Data sources
 
-Copy the **Link Text** and **Link URL** into the matching section of the submission form. The last column records what each source contributed. Current milestone: the clickable global temperature map and two regional histories, 14 November 2026.
+These tables list the sources used in Dipole and what each contributed.
 
 ## NASA Data
 
@@ -42,15 +42,3 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 | SciPy, false discovery control | https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.false_discovery_control.html | Adjusted the cell trend tests for the significance overlay. |
 | axe-core 4.10.2 | https://github.com/dequelabs/axe-core/tree/v4.10.2 | Checked the temperature and water pages for automated accessibility findings at desktop and phone widths. |
 | Matplotlib | https://matplotlib.org/ | Drew the two-line chart from Dipole’s annual data. |
-
-## AI use and planning references
-
-AI tools assisted with planning, analysis code, numerical checks, and documentation. [OpenAI Codex](https://openai.com/codex/) · [Anthropic Claude](https://claude.ai/) · [Project workflows](https://github.com/NakliTechie/ntkit)
-
-OpenAI Codex helped write the project README and captured its animated timeline from the explorer’s yearly temperature maps. [Playwright](https://playwright.dev/) drove the year slider and [FFmpeg](https://ffmpeg.org/) encoded the frames as a GIF. The regional chart and rates come from the project’s own GISTEMP analysis. The findings guide uses screenshots of the working explorers, captured with Playwright.
-
-The team used the official challenge brief to define the four questions the product should answer and the event page to plan submission. [Challenge brief](https://www.spaceappschallenge.org/2026/challenges/earth-system-trend-detective/) · [Event and submission instructions](https://www.spaceappschallenge.org/2026/)
-
-## Updating the log
-
-Add every new source when it first contributes to the project. Record its public URL and its specific use, including any reused code, text or image. For changing datasets, also record the version and access date. Add proposed datasets when they actually supply a project result.

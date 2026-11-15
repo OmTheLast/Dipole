@@ -17,10 +17,14 @@ Each frame shows one year. Red means warmer than that location’s 1951–1980 a
 - **People.** Estimated 2020 population living where warming outpaced the global average.
 - **Water.** [Northwest India’s water storage](https://ompatnaik.com/Dipole/water/) after each monsoon, from NASA’s GRACE satellites.
 
+## How we used Super Intelligence (SI) tools
+
+Our team used Codex and Claude to research data sources, organize the repository, write and debug code, prepare documentation, and generate the demo. We reviewed all SI-generated code before using it in Dipole. These tools helped us work faster and gave us more time to check and refine the project.
+
 ## Learn more
 
 - [Temperature methods, results and how to reproduce them](docs/temperature.md)
 - [Water storage methods](docs/water/method.md)
-- [Data sources and AI use](docs/sources.md)
+- [Data sources](docs/sources.md)
 
 Built for the 2026 NASA Space Apps Challenge, [Be An Earth System Trend Detective!](https://www.spaceappschallenge.org/2026/challenges/earth-system-trend-detective/)
