@@ -47,7 +47,7 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 
 AI tools assisted with planning, analysis code, numerical checks, and documentation. [OpenAI Codex](https://openai.com/codex/) · [Anthropic Claude](https://claude.ai/) · [Project workflows](https://github.com/NakliTechie/ntkit)
 
-OpenAI Codex helped write the project README and captured its animated timeline from the explorer’s yearly temperature maps. [Playwright](https://playwright.dev/) drove the year slider and [FFmpeg](https://ffmpeg.org/) encoded the frames as a GIF. The regional chart and rates come from the project’s own GISTEMP analysis.
+OpenAI Codex helped write the project README and captured its animated timeline from the explorer’s yearly temperature maps. [Playwright](https://playwright.dev/) drove the year slider and [FFmpeg](https://ffmpeg.org/) encoded the frames as a GIF. The regional chart and rates come from the project’s own GISTEMP analysis. The findings guide uses screenshots of the working explorers, captured with Playwright.
 
 The team used the official challenge brief to define the four questions the product should answer and the event page to plan submission. [Challenge brief](https://www.spaceappschallenge.org/2026/challenges/earth-system-trend-detective/) · [Event and submission instructions](https://www.spaceappschallenge.org/2026/)
 
