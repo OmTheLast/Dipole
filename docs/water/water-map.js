@@ -44,7 +44,7 @@ export async function loadMap() {
   let season;
   let global = false;
   // Include neighboring land for context and retain the same view on every scrub.
-  const bounds = () => global ? [-180, -90, 180, 90] : [65, 22, 84, 34];
+  const bounds = () => global ? [-180, -90, 180, 90] : [67, 20, 84, 34];
   function draw() {
     if (!season || !canvas.clientWidth) return;
     const [west, south, east, north] = bounds();

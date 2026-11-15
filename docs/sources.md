@@ -20,11 +20,12 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 
 | Link Text | Link URL | How Dipole used it |
 | --- | --- | --- |
+| Central Ground Water Board, Dynamic Ground Water Resources of Madhya Pradesh 2024, section 3.1 | https://cgwb.gov.in/cgwbpnm/public/uploads/documents/1743585614534718415file.pdf | Identifies October and November as the post-monsoon season. This supports comparing Madhya Pradesh with northwest India in the same months. |
 | National Snow and Ice Data Center, Arctic Weather and Climate | https://nsidc.org/learn/parts-cryosphere/arctic-weather-and-climate | Geographic basis for approximating the Arctic Circle with the grid edge at 66°N. |
 | Rantanen et al. (2022), The Arctic has warmed nearly four times faster than the globe since 1979 | https://doi.org/10.1038/s43247-022-00498-3 | Research precedent for the Arctic boundary. Dipole calculated its own rate against a different comparison region. |
 | Allan et al., Seasonal Changes in the North Atlantic Cold Anomaly | https://doi.org/10.1029/2019JC015379 | Scientific context for investigating surface temperatures south of Greenland. |
 | Molodtsov et al., North Atlantic temperature and salinity changes | https://doi.org/10.1038/s41612-025-01210-w | Background for studying the subpolar latitude band. Dipole selected its own longitude limits. |
-| Natural Earth, 1:10m state and province boundaries v5.1.2 | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson | Delineates Rajasthan, Punjab, Haryana and Delhi for the regional water-storage average and outlines the four areas on the water map. |
+| Natural Earth, 1:10m state and province boundaries v5.1.2 | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson | Delineates Rajasthan, Punjab, Haryana and Delhi for the regional water-storage average and delineates Madhya Pradesh for the paired water comparison and map. |
 | Rodell et al. (2009), Satellite-based estimates of groundwater depletion in India | https://doi.org/10.1038/nature08238 | Defines the four-area study region. Dipole estimates total water storage. |
 | Gravity Toolkit mission-month documentation | https://gravity-toolkit.readthedocs.io/en/stable/api_reference/time.html | Identifies shifted observation dates for the December 2011 and May 2015 nominal mission months. |
 | Natural Earth, 1:110m land polygons | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_110m_land.geojson | Public-domain coastline geometry used to orient visitors on the clickable world map. Retrieved 14 November 2026. |

@@ -38,3 +38,5 @@ figcaption, .waterLinks {color:var(--muted); font-size:13px}
 .waterHistory h3 {font-size:16px}
 .waterHistory #waterTrend {font-size:14px}
 @media(max-width:780px){.linkedViews {grid-template-columns:1fr;gap:8px}}
+
+.trendComparison {margin:22px 0}.trendComparison h3 {font-size:16px}.trendComparison th:first-child {text-align:left}.trendComparison td {white-space:nowrap}

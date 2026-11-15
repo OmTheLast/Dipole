@@ -1,4 +1,4 @@
-"""Build the northwest India water chart from JPL GRACE/GRACE-FO CRI mascons."""
+"""Build the Indian regional water comparison from JPL GRACE/GRACE-FO CRI mascons."""
 import argparse
 import json
 from pathlib import Path
@@ -22,9 +22,9 @@ DEST = Path("docs/water")
 STATES = {"IN-RJ", "IN-PB", "IN-HR", "IN-DL"}
 
 
-def regional_weights(lat, lon, features, subdivisions=32):
-    geometries = [f["geometry"] for f in features if f["properties"]["iso_3166_2"] in STATES]
-    assert len(geometries) == len(STATES)
+def regional_weights(lat, lon, features, subdivisions=32, state_codes=STATES):
+    geometries = [f["geometry"] for f in features if f["properties"]["iso_3166_2"] in state_codes]
+    assert len(geometries) == len(state_codes)
     west, south, east, north = np.asarray([bounds(g) for g in geometries]).T
     rows = np.flatnonzero((lat >= south.min() - .25) & (lat <= north.max() + .25))
     cols = np.flatnonzero((lon >= west.min() - .25) & (lon <= east.max() + .25))
@@ -94,7 +94,7 @@ def export_water_map(ds, labels, seasons, features):
     states = []
     for feature in features:
         props = feature["properties"]
-        if props["iso_3166_2"] in STATES:
+        if props["iso_3166_2"] in STATES | {"IN-MP"}:
             geometry = feature["geometry"]
             assert geometry["type"] == "Polygon"
             rings = [np.round(ring, 3).tolist() for ring in geometry["coordinates"]]
@@ -103,7 +103,7 @@ def export_water_map(ds, labels, seasons, features):
                                             separators=(",", ":"), allow_nan=False))
 
 
-def plots(monthly, seasons, fit):
+def plots(monthly, seasons, fits):
     markers = {}
     matplotlib.rcParams["svg.hashsalt"] = "dipole-water"
     for monthly_view in [False, True]:
@@ -114,16 +114,20 @@ def plots(monthly, seasons, fit):
         ax.spines["bottom"].set_color("#a2afa9")
         ax.grid(axis="y", color="#dadfd7", linewidth=.7)
         ax.axhline(0, color="#83988e", linewidth=1)
-        if monthly_view:
-            dates = monthly.index.to_timestamp()
-            ax.plot(dates, monthly, color="#4c818b", linewidth=1.2, marker=".", markersize=2.5)
-            post = monthly.index.month.isin([10, 11])
-            ax.scatter(dates[post], monthly[post], s=12, color="#203f68", zorder=3)
-        else:
-            ax.plot(seasons.index, seasons, "o-", color="#245c65", linewidth=1.5, markersize=4)
-            ends = np.array([fit["first"], fit["last"]])
-            ax.plot(ends, fit["intercept"]+(ends-fit["first"])*fit["slope"]/10, "--", color="#ad5b31")
-            ax.set_xticks(sorted({fit["first"], *range(2005, fit["last"], 5), fit["last"]}))
+        for region, color, marker in [("northwest", "#245c65", "o"), ("central", "#a25228", "^")]:
+            if monthly_view:
+                dates = monthly.index.to_timestamp()
+                ax.plot(dates, monthly[region], color=color, linewidth=1)
+                post = monthly.index.month.isin([10, 11])
+                ax.scatter(dates[post], monthly.loc[post, region], s=7, marker=marker, color=color)
+            else:
+                ax.plot(seasons.index, seasons[region], marker=marker, color=color, linewidth=1, markersize=4)
+                fit = fits[region]
+                ends = np.array([fit["first"], fit["last"]])
+                ax.plot(ends, fit["intercept"]+(ends-fit["first"])*fit["slope"]/10, "--", color=color)
+        if not monthly_view:
+            first, last = seasons.dropna().index[[0, -1]]
+            ax.set_xticks(sorted({first, *range(2005, last, 5), last}))
         ax.tick_params(length=0, labelsize=10, pad=5, colors="#344940")
         ax.yaxis.set_major_locator(MaxNLocator(6))
         ax.set_ylabel("Water storage anomaly (cm)")
@@ -154,11 +158,14 @@ def main():
     with nc.Dataset(args.netcdf) as ds:
         v = ds["lwe_thickness"]
         assert v.units == "cm" and v.dimensions == ("time", "lat", "lon")
-        ry, cx, area = regional_weights(ds["lat"][:], ds["lon"][:], features)
-        assert np.all(ds["land_mask"][ry, cx][area > 0] == 1)
-        grid = v[:, ry, cx].astype(float).filled(np.nan)[:, area > 0]
-        assert np.isfinite(grid).all()
-        values = np.average(grid, axis=1, weights=area[area > 0])
+        values, areas = {}, {}
+        for region, codes in [("northwest", STATES), ("central", {"IN-MP"})]:
+            ry, cx, area = regional_weights(ds["lat"][:], ds["lon"][:], features, state_codes=codes)
+            assert np.all(ds["land_mask"][ry, cx][area > 0] == 1)
+            grid = v[:, ry, cx].astype(float).filled(np.nan)[:, area > 0]
+            assert np.isfinite(grid).all()
+            values[region] = np.average(grid, axis=1, weights=area[area > 0])
+            areas[region] = round(float(area.sum()))
         tv = ds["time"]
         dates = nc.num2date(tv[:], tv.units)
         months = pd.PeriodIndex([d.strftime("%Y-%m") for d in dates], freq="M")
@@ -169,27 +176,43 @@ def main():
         idx = [i for i, m in enumerate(labels) if str(m) == period]
         if len(idx) == 2:
             labels[idx[which]] += offset
-    series = pd.Series(values, index=pd.PeriodIndex(labels, freq="M"))
+    series = pd.DataFrame(values, index=pd.PeriodIndex(labels, freq="M"))
     assert series.index.is_unique and series.index.is_monotonic_increasing
     monthly = series.reindex(pd.period_range(series.index.min(), series.index.max(), freq="M"))
     post = monthly[monthly.index.month.isin([10, 11])]
     grouped = post.groupby(post.index.year)
     seasons = grouped.mean().where(grouped.count() == 2)
-    fit = annual_fit(seasons)
+    paired = seasons.dropna()
+    fits = {region: annual_fit(paired[region]) for region in paired}
+    fits["difference"] = annual_fit(paired["northwest"] - paired["central"])
     DEST.mkdir(exist_ok=True)
     with nc.Dataset(args.netcdf) as ds:
         export_water_map(ds, labels, seasons, features)
-    markers = plots(monthly, seasons, fit)
-    def obs(m):
-        value = monthly.get(m, np.nan)
-        return round(float(value), 3) if np.isfinite(value) else None
-    data = dict(source=args.netcdf.name, areaKm2=round(float(area.sum())),
-                start=str(monthly.index[0]), end=str(monthly.index[-1]), months=int(series.size), fit=fit, markers=markers,
-                seasons=[dict(year=int(y), october=obs(f"{y}-10"), november=obs(f"{y}-11"),
-                              mean=round(v, 3) if np.isfinite(v) else None) for y,v in seasons.items()])
+    markers = plots(monthly, seasons, fits)
+
+    def rounded(value):
+        return round(float(value), 3) if pd.notna(value) else None
+
+    records = []
+    for year, means in seasons.iterrows():
+        row = {"year": int(year)}
+        for region in seasons:
+            data = dict(october=rounded(monthly[region].get(f"{year}-10")),
+                        november=rounded(monthly[region].get(f"{year}-11")), mean=rounded(means[region]))
+            if region == "northwest":
+                row.update(data)
+            else:
+                row[region] = data
+        records.append(row)
+    data = dict(source=args.netcdf.name, areaKm2=areas["northwest"], centralAreaKm2=areas["central"],
+                start=str(monthly.index[0]), end=str(monthly.index[-1]), months=len(series),
+                fit=fits["northwest"], centralFit=fits["central"], differenceFit=fits["difference"],
+                markers=markers, seasons=records)
     (DEST/"series.json").write_text(json.dumps(data, indent=2, allow_nan=False)+"\n")
-    monthly.rename("anomaly_cm").to_csv(DEST/"monthly.csv", index_label="month", float_format="%.5f")
-    print(data["areaKm2"],data["months"],fit,data["seasons"][-1])
+    monthly.rename(columns={"northwest": "anomaly_cm", "central": "madhya_pradesh_anomaly_cm"}).to_csv(
+        DEST/"monthly.csv", index_label="month", float_format="%.5f")
+    print(areas, fits)
+
 
 
 if __name__ == "__main__":

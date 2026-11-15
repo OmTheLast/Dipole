@@ -1,6 +1,7 @@
 {
   "source": "GRCTellus.JPL.200204_202609.GLO.RL06.3M.MSCNv04CRI.nc",
   "areaKm2": 439663,
+  "centralAreaKm2": 310290,
   "start": "2002-04",
   "end": "2026-09",
   "months": 261,
@@ -15,6 +16,30 @@
     "rho": 0.9499963477960921,
     "ols": -20.46095648004293,
     "sen": -21.002986589168486
+  },
+  "centralFit": {
+    "first": 2002,
+    "last": 2025,
+    "n": 20,
+    "intercept": 8.132809390181235,
+    "slope": 7.2120464907662205,
+    "low": 0.3195730445946392,
+    "high": 14.104519936937802,
+    "rho": 0.46827380602355406,
+    "ols": 6.414338241576151,
+    "sen": 6.900660425447153
+  },
+  "differenceFit": {
+    "first": 2002,
+    "last": 2025,
+    "n": 20,
+    "intercept": 2.474527008294083,
+    "slope": -25.138139945753768,
+    "low": -31.604351432581176,
+    "high": -18.67192845892636,
+    "rho": 0.6741126934200548,
+    "ols": -26.875294721619078,
+    "sen": -25.851596922378548
   },
   "markers": {
     "post-monsoon": {
@@ -83,145 +108,265 @@
       "year": 2002,
       "october": 10.184,
       "november": 4.704,
-      "mean": 7.444
+      "mean": 7.444,
+      "central": {
+        "october": 8.896,
+        "november": 0.874,
+        "mean": 4.885
+      }
     },
     {
       "year": 2003,
       "october": 22.073,
       "november": 15.429,
-      "mean": 18.751
+      "mean": 18.751,
+      "central": {
+        "october": 24.058,
+        "november": 14.852,
+        "mean": 19.455
+      }
     },
     {
       "year": 2004,
       "october": 10.998,
       "november": 7.693,
-      "mean": 9.346
+      "mean": 9.346,
+      "central": {
+        "october": 14.946,
+        "november": 10.519,
+        "mean": 12.733
+      }
     },
     {
       "year": 2005,
       "october": 9.715,
       "november": 5.989,
-      "mean": 7.852
+      "mean": 7.852,
+      "central": {
+        "october": 17.097,
+        "november": 11.849,
+        "mean": 14.473
+      }
     },
     {
       "year": 2006,
       "october": 9.569,
       "november": 5.225,
-      "mean": 7.397
+      "mean": 7.397,
+      "central": {
+        "october": 15.812,
+        "november": 8.212,
+        "mean": 12.012
+      }
     },
     {
       "year": 2007,
       "october": 3.024,
       "november": 0.089,
-      "mean": 1.556
+      "mean": 1.556,
+      "central": {
+        "october": 13.545,
+        "november": 4.397,
+        "mean": 8.971
+      }
     },
     {
       "year": 2008,
       "october": 1.469,
       "november": -3.015,
-      "mean": -0.773
+      "mean": -0.773,
+      "central": {
+        "october": 12.245,
+        "november": 5.551,
+        "mean": 8.898
+      }
     },
     {
       "year": 2009,
       "october": -8.886,
       "november": -11.937,
-      "mean": -10.412
+      "mean": -10.412,
+      "central": {
+        "october": 5.734,
+        "november": 5.182,
+        "mean": 5.458
+      }
     },
     {
       "year": 2010,
       "october": -0.556,
       "november": -5.407,
-      "mean": -2.982
+      "mean": -2.982,
+      "central": {
+        "october": 9.523,
+        "november": 5.361,
+        "mean": 7.442
+      }
     },
     {
       "year": 2011,
       "october": 4.169,
       "november": 2.575,
-      "mean": 3.372
+      "mean": 3.372,
+      "central": {
+        "october": 20.275,
+        "november": 16.223,
+        "mean": 18.249
+      }
     },
     {
       "year": 2012,
       "october": null,
       "november": -3.555,
-      "mean": null
+      "mean": null,
+      "central": {
+        "october": null,
+        "november": 12.466,
+        "mean": null
+      }
     },
     {
       "year": 2013,
       "october": 1.027,
       "november": -0.505,
-      "mean": 0.261
+      "mean": 0.261,
+      "central": {
+        "october": 32.848,
+        "november": 24.321,
+        "mean": 28.585
+      }
     },
     {
       "year": 2014,
       "october": -8.96,
       "november": -13.687,
-      "mean": -11.323
+      "mean": -11.323,
+      "central": {
+        "october": 22.22,
+        "november": 14.923,
+        "mean": 18.571
+      }
     },
     {
       "year": 2015,
       "october": null,
       "november": null,
-      "mean": null
+      "mean": null,
+      "central": {
+        "october": null,
+        "november": null,
+        "mean": null
+      }
     },
     {
       "year": 2016,
       "october": null,
       "november": -20.75,
-      "mean": null
+      "mean": null,
+      "central": {
+        "october": null,
+        "november": 20.212,
+        "mean": null
+      }
     },
     {
       "year": 2017,
       "october": null,
       "november": null,
-      "mean": null
+      "mean": null,
+      "central": {
+        "october": null,
+        "november": null,
+        "mean": null
+      }
     },
     {
       "year": 2018,
       "october": -32.26,
       "november": -33.167,
-      "mean": -32.713
+      "mean": -32.713,
+      "central": {
+        "october": 6.888,
+        "november": 2.676,
+        "mean": 4.782
+      }
     },
     {
       "year": 2019,
       "october": -26.136,
       "november": -31.274,
-      "mean": -28.705
+      "mean": -28.705,
+      "central": {
+        "october": 26.18,
+        "november": 19.808,
+        "mean": 22.994
+      }
     },
     {
       "year": 2020,
       "october": -29.932,
       "november": -35.043,
-      "mean": -32.488
+      "mean": -32.488,
+      "central": {
+        "october": 22.231,
+        "november": 12.72,
+        "mean": 17.476
+      }
     },
     {
       "year": 2021,
       "october": -36.056,
       "november": -38.898,
-      "mean": -37.477
+      "mean": -37.477,
+      "central": {
+        "october": 22.65,
+        "november": 14.228,
+        "mean": 18.439
+      }
     },
     {
       "year": 2022,
       "october": -31.16,
       "november": -29.787,
-      "mean": -30.473
+      "mean": -30.473,
+      "central": {
+        "october": 23.043,
+        "november": 17.124,
+        "mean": 20.084
+      }
     },
     {
       "year": 2023,
       "october": -30.759,
       "november": -33.574,
-      "mean": -32.167
+      "mean": -32.167,
+      "central": {
+        "october": 22.355,
+        "november": 16.65,
+        "mean": 19.502
+      }
     },
     {
       "year": 2024,
       "october": -20.122,
       "november": -25.067,
-      "mean": -22.594
+      "mean": -22.594,
+      "central": {
+        "october": 31.659,
+        "november": 25.076,
+        "mean": 28.368
+      }
     },
     {
       "year": 2025,
       "october": -12.711,
       "november": -19.655,
-      "mean": -16.183
+      "mean": -16.183,
+      "central": {
+        "october": 34.54,
+        "november": 30.482,
+        "mean": 32.511
+      }
     }
   ]
 }
