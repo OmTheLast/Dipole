@@ -8,8 +8,8 @@
 <title>Dipole · Same planet, opposite trends</title>
 <meta name="description" content="Explore how surface temperature changed at every place on Earth since 1900, using NASA’s GISTEMP record.">
 <link rel="preload" href="fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="map/style.css?v=design-1">
-<script src="map/app.js?v=design-1" defer></script>
+<link rel="stylesheet" href="map/style.css?v=design-2">
+<script src="map/app.js?v=design-2" defer></script>
 </head>
 <body>
 <div class="deep">
@@ -51,7 +51,7 @@
 
 <section class="inspector" aria-label="Selected location">
 <p id="kind" class="kind">Region</p>
-<div id="details" aria-live="polite"><h2 id="name">Arctic</h2><p id="bounds"></p><p id="coverage"></p><p class="metriclabel" id="metricLabel">Estimated change</p><div id="change">…</div><p id="rate"></p><p id="reference"></p><p id="interval"></p><p id="explain"></p><p id="sparse"></p><p id="cellResidents" class="note"></p></div>
+<div id="details" aria-live="polite"><p class="q">Where</p><h2 id="name">Arctic</h2><p id="bounds"></p><p id="coverage"></p><p class="q">What changed, and by how much</p><p class="metriclabel" id="metricLabel">Estimated change</p><div id="change">…</div><p id="rate"></p><p id="reference"></p><p class="q">How certain</p><p id="interval"></p><p id="explain"></p><p id="sparse"></p><p id="cellResidents" class="note"></p></div>
 <div class="history"><h3>Annual temperature</h3><p class="caption">°C above or below the 1951–1980 average</p><div class="chartkey"><span>Local</span><span>Global</span><span id="fitKey">Local fitted trend</span></div><canvas id="plot" role="img" aria-label="Annual temperature anomaly chart"></canvas><details><summary>See annual values</summary><div class="tablebox"><table><thead><tr><th>Year</th><th>Local (°C)</th><th>Global (°C)</th></tr></thead><tbody id="annual"></tbody></table></div></details></div>
 </section>
 </div>
@@ -59,7 +59,7 @@
 
 <main class="shore">
 <section id="population" class="chapter" aria-labelledby="exposureHeading">
-<div class="chapterhead"><h2 id="exposureHeading">Who lives where it is warming faster?</h2>
+<div class="chapterhead"><h2 id="exposureHeading">Who lives where it is warming faster than the world?</h2>
 <p id="exposureCaption">Loading 2020 population estimates…</p></div>
 <div id="exposureData" hidden>
 <figure class="populationBar"><figcaption>India’s residents in cells with a temperature trend</figcaption>
@@ -70,7 +70,7 @@
 <tbody id="exposureRows"></tbody></table></div>
 <details><summary>How the count and uncertainty work</summary>
 <p>We add the estimated 2020 residents of each 2° cell whose local warming rate exceeds the global rate. The percentage uses residents in cells with a complete trend. For India, we count only population pixels whose centres fall inside the mapped country boundary.</p>
-<p id="exposureIntervals"></p><p>These cell-by-cell intervals can be too narrow for short records. The population counts describe where people lived in 2020. Health outcomes require separate data.</p>
+<p id="exposureIntervals"></p><p>The global average includes the oceans, which cover most of the planet and warm more slowly than land. Because people live on land, many of them live in cells that warm faster than that average for this reason alone. The counts describe where people lived in 2020, not health effects.</p>
 </details></div></section>
 
 <section class="chapter"><div class="chapterhead"><h2>Regions side by side</h2><p id="comparisonCaption"></p></div><div class="scrolltable"><table class="comparison"><thead><tr><th scope="col">Region</th><th scope="col" id="timeHeading">Years fitted</th><th scope="col">Local</th><th scope="col">Global</th><th scope="col">Local − global</th></tr></thead><tbody id="comparison"></tbody></table></div><p id="comparisonNote" class="note"></p></section>
@@ -80,7 +80,7 @@
 <details class="method chapter"><summary>How to read the trends and uncertainty</summary>
 <p>Each trend is the slope of a straight line through annual temperatures relative to the 1951–1980 average. For the global comparison we fit the yearly local minus global differences. A negative difference means a place warmed more slowly than the world or cooled more quickly. The chart shows the two original histories.</p>
 <p>In the yearly view, each cell needs all 12 months in the selected year. For a trend it needs all 12 months in every year of the period. Gray marks missing estimates. Regional averages weight cells by area and require at least 80% coverage each month. If a region has gaps, its fitted line uses the uninterrupted record after the last gap. Its global comparison uses exactly those years.</p>
-<p>The 95% interval describes the fitted trend for the selected place. We account for similarities between nearby years using Newey–West standard errors with three annual lags. The interval excludes additional uncertainty in NASA’s temperature estimates. Map colors show estimated rates. Examining many locations can produce chance findings.</p>
+<p>The 95% interval describes the fitted trend for the selected place. We account for similarities between nearby years using Newey–West standard errors with three annual lags. The interval excludes additional uncertainty in NASA’s temperature estimates. Map colors show estimated rates. Examining many locations can produce chance findings. In tests on simulated records with no trend at all, intervals built this way excluded zero in roughly 10–14% of cases rather than 5%, so treat them as optimistic.</p>
 <p><b>Hatched cells.</b> NASA’s standard grid fills each cell from stations up to 1,200 km away. Hatched land cells are where NASA’s 250 km grid has data in fewer than half the months of the selected period. Ocean cells are not hatched. A cell counts as land when its centre lies inside the Natural Earth outline.</p></details>
 
 <footer><p>Built for the 2026 NASA Space Apps Challenge, “Be an Earth System Trend Detective!”</p><p>Temperature estimates from <a href="https://data.giss.nasa.gov/gistemp/">NASA GISS GISTEMP v4</a>. Coastlines from <a href="https://www.naturalearthdata.com/">Natural Earth</a>. Population from <a href="https://human-settlement.emergency.copernicus.eu/ghs_pop2023.php">GHS-POP 2020</a>.</p></footer>

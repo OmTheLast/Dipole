@@ -303,11 +303,11 @@ function showTrendDetails(stats, relative, fitStart, globalRate, cell) {
   $("interval").textContent = valid ? "95% interval: " + changeText(low*scale) + " to " + changeText(high*scale) + units + "." : "";
   let interpretation = "The record is incomplete for this period.";
   if (valid && showGap) {
-    interpretation = low > 0 ? "The local trend is above the global trend." :
-      high < 0 ? "The local trend is below the global trend." : "The interval includes zero. The trends cannot be distinguished here.";
+    interpretation = low > 0 ? "The fitted interval suggests faster warming than the globe." :
+      high < 0 ? "The fitted interval suggests slower warming than the globe." : "The interval includes zero. The trends cannot be distinguished here.";
   } else if (valid) {
-    interpretation = low > 0 ? "The interval supports warming here." :
-      high < 0 ? "The interval supports cooling here." : "The interval includes zero. The direction is uncertain.";
+    interpretation = low > 0 ? "The fitted interval suggests warming here." :
+      high < 0 ? "The fitted interval suggests cooling here." : "The interval includes zero. The direction is uncertain.";
   }
   $("explain").textContent = interpretation;
   $("sparse").textContent = cell !== undefined && coverage[cell] ?
@@ -505,9 +505,7 @@ function showExposure() {
   $("indiaFasterBar").style.width = share + "%";
   $("indiaFasterLabel").textContent = share.toFixed(1) + "% faster than global";
   $("indiaOtherLabel").textContent = (100 - share).toFixed(1) + "% at or below global";
-  $("exposureIntervals").textContent = "A stricter check counts only cells whose local-minus-global trend has a 95% interval entirely above zero. This includes " +
-    people.format(groups.india.aboveInterval) + " residents in India and " + people.format(groups.world.aboveInterval) +
-    " worldwide. Each interval applies to one cell. The counts have no map-wide significance adjustment.";
+  $("exposureIntervals").textContent = "";
 }
 
 function render(reveal = false) {

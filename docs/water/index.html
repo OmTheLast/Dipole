@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#102a43"><link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <title>Northwest India water storage · Dipole</title>
-<link rel="preload" href="../fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="../map/style.css?v=design-1"><link rel="stylesheet" href="water.css?v=design-1"><script type="module" src="water.js"></script></head>
+<link rel="preload" href="../fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="../map/style.css?v=design-2"><link rel="stylesheet" href="water.css?v=design-2"><script type="module" src="water.js?v=design-2"></script></head>
 <body>
 <div class="deep waterdeep">
 <header class="top"><a class="brand" href="../"><span class="brandmark" aria-hidden="true"></span>Dipole</a><nav aria-label="Project"><a href="../">Temperature</a><a href="./" aria-current="page">Water</a><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources</a><a href="https://github.com/OmTheLast/Dipole">GitHub</a></nav></header>
@@ -31,6 +31,6 @@
 <details><summary>See every post-monsoon estimate</summary><div class="scrolltable"><table><thead><tr><th>Year</th><th>October (cm)</th><th>November (cm)</th><th>Mean (cm)</th></tr></thead><tbody id="waterRows"></tbody></table></div></details>
 <details><summary>How to read the data and uncertainty</summary>
 <p>GRACE senses changes in total water stored in groundwater, soil, surface water and snow. Recovering an absolute volume or isolating groundwater would require extra information. The monthly series starts in April 2002. Missing months appear as gaps, including the break between satellite missions.</p>
-<p>Each post-monsoon point averages October and November equally and requires both observations. Comparing the same months each year controls for the usual seasonal cycle. The line fits only complete seasons and accounts for correlation across calendar years. Its approximate 95% interval describes uncertainty in that fitted slope. It excludes additional uncertainty from satellite measurements and the regional boundary.</p>
-<p id="waterSensitivity"></p><p>The interval treats the estimated correlation as fixed. The estimate reached the model’s upper limit of 0.95, which makes the interval particularly sensitive to that choice.</p><p>The regional mean weights each grid square by the area inside the four boundaries. The 0.5° grid represents broader measurements at about 3° resolution. We used the JPL coastal-filtered product without optional gain factors.</p>
+<p>Each post-monsoon point averages October and November equally and requires both observations. Comparing the same months each year controls for the usual seasonal cycle. The period averages use only complete seasons.</p>
+<p id="waterSensitivity"></p><p>The regional mean weights each grid square by the area inside the four boundaries. The 0.5° grid represents broader measurements at about 3° resolution. We used the JPL coastal-filtered product without optional gain factors.</p>
 </details><p class="waterLinks"><a href="monthly.csv" download>Download monthly observations (CSV)</a> · <a href="https://podaac.jpl.nasa.gov/dataset/TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4">NASA/JPL source data</a></p></div></section></main></body></html>
