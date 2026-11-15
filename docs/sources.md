@@ -29,7 +29,7 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 | Gravity Toolkit mission-month documentation | https://gravity-toolkit.readthedocs.io/en/stable/api_reference/time.html | Identifies shifted observation dates for the December 2011 and May 2015 nominal mission months. |
 | Natural Earth, 1:110m land polygons | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_110m_land.geojson | Public-domain coastline geometry used to orient visitors on the clickable world map. Retrieved 14 November 2026. |
 | European Commission, GHS-POP R2023A, 2020 residential population | https://human-settlement.emergency.copernicus.eu/ghs_pop2023.php | Counts of estimated residents at 30 arc-seconds, summed into Dipole’s 2° cells. Retrieved 14 November 2026. |
-| Natural Earth, 1:10m country boundaries v5.1.2 | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_10m_admin_0_countries.geojson | India’s mapped boundary selects population pixels by their centres, including in cross-border temperature cells. |
+| Natural Earth, 1:10m country boundaries v5.1.2 | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_10m_admin_0_countries.geojson | Country and territory boundaries select population pixels by their centres and match an optional browser location to a country locally. |
 | Rasterio | https://rasterio.readthedocs.io/ | Read the population raster and applied the country boundary on its native grid. |
 | Schibsted Grotesk typeface, SIL Open Font License 1.1 | https://github.com/schibsted/schibsted-grotesk | The site's only typeface, self-hosted in docs/fonts from the Fontsource package. |
 | Python | https://www.python.org/ | Ran the analysis and verification scripts. |
@@ -37,6 +37,7 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 | NumPy | https://numpy.org/ | Calculated area-weighted regional averages and annual differences. |
 | statsmodels | https://www.statsmodels.org/ | Fitted temperature trends and estimated confidence intervals that account for similarities between nearby years. |
 | SciPy | https://scipy.org/ | Independently read the source grid and checked the trend calculations. |
+| SciPy, false discovery control | https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.false_discovery_control.html | Adjusted the cell trend tests for the significance overlay. |
 | Matplotlib | https://matplotlib.org/ | Drew the two-line chart from Dipole’s annual data. |
 
 ## AI use and planning references

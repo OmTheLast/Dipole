@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#102a43"><link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <title>Northwest India water storage · Dipole</title>
-<link rel="preload" href="../fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="../map/style.css?v=design-2"><link rel="stylesheet" href="water.css?v=design-2"><script type="module" src="water.js?v=design-2"></script></head>
+<link rel="preload" href="../fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="../map/style.css?v=guide-1"><link rel="stylesheet" href="water.css?v=guide-1"><script defer src="../map/player.js?v=2"></script><script defer src="../map/tour.js?v=1"></script><script type="module" src="water.js?v=guide-1"></script></head>
 <body>
 <div class="deep waterdeep">
 <header class="top"><a class="brand" href="../"><span class="brandmark" aria-hidden="true"></span>Dipole</a><nav aria-label="Project"><a href="../">Temperature</a><a href="./" aria-current="page">Water</a><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources</a><a href="https://github.com/OmTheLast/Dipole">GitHub</a></nav></header>
 <section class="hero"><h1>Water after the monsoon.</h1>
-<p class="lede">NASA’s GRACE and GRACE-FO satellites sense tiny changes in Earth’s gravity as water moves. How much water did Rajasthan, Punjab, Haryana and Delhi store after each rainy season since 2002?</p></section>
+<p class="lede">NASA’s GRACE and GRACE-FO satellites sense tiny changes in Earth’s gravity as water moves. Did northwest India hold more or less water than usual after each rainy season? Move through the years to compare. <a href="../?tour=start">Take the full Dipole tour</a>.</p></section>
 </div>
 <main class="shore watershore">
 <section class="atlas waterPanel"><h2>Regional water storage</h2>
@@ -14,12 +14,13 @@
 <p id="waterStatus" role="status">Loading NASA observations…</p>
 <div id="waterData" hidden>
 <div class="seasonControls"><label for="waterYear">Post-monsoon year <output id="yearLabel" for="waterYear"></output></label>
-<input type="range" id="waterYear" step="1">
+<button class="action play" type="button" id="playWater">Play</button><input type="range" id="waterYear" step="1">
 <div class="quickYears" aria-label="Comparison years"><button type="button" data-year="2021">2021</button><button type="button" data-year="2025">2025</button></div></div>
 <div id="waterReading" aria-live="polite"></div>
 <div class="linkedViews">
 <figure class="waterAtlas">
 <div class="waterMapHead"><h3 id="mapTitle">Post-monsoon storage</h3><div class="mapExtent"><button type="button" id="indiaMap" aria-pressed="true">Northwest India</button><button type="button" id="worldMap" aria-pressed="false">World</button></div></div>
+<div class="waterNav"><button type="button" id="waterOut" aria-label="Zoom water map out">−</button><button type="button" id="waterIn" aria-label="Zoom water map in">+</button> Scroll to zoom. Drag to explore.</div>
 <div class="waterMapFrame"><canvas id="waterMap" role="img" aria-labelledby="mapTitle" aria-describedby="waterMapCaption"></canvas><span id="mapMessage" role="status">Loading water map…</span></div>
 <div class="mapLegend"><span>Below average</span><div class="waterScale"><div id="waterRamp"></div><div class="scaleNumbers"><span>≤ −100</span><span>0</span><span>≥ +100 cm</span></div></div><span>Above average</span></div>
 <figcaption id="waterMapCaption">October–November total water storage relative to the 2004–2009 average at each location. Colors use the same scale every year. Outlines mark the four areas in the chart. NASA resolves patterns about 3° across.</figcaption>

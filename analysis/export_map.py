@@ -6,7 +6,9 @@ from pathlib import Path
 import netCDF4 as nc
 import numpy as np
 
-from temperature import REGIONS, annual_series, trend
+from scipy.stats import false_discovery_control
+
+from temperature import REGIONS, annual_series, fit_trend, trend
 
 DEST = Path("docs/map")
 STARTS = (1980, 1900)
@@ -52,10 +54,23 @@ def main():
             records = np.full((90, 180, 6 + len(years)), np.nan, dtype="<f4")
             records[:, :, 6:] = annual.transpose(1, 2, 0)
             valid = np.isfinite(annual).all(axis=0)
+            pvalues = np.full((90, 180, 2), np.nan)
             for row, col in zip(*np.where(valid)):
                 local = annual[:, row, col]
-                records[row, col, :3] = trend(local, years)
-                records[row, col, 3:6] = trend(local - reference, years)
+                for test, series in enumerate((local, local - reference)):
+                    fit = fit_trend(series, years)
+                    offset = 3 * test
+                    records[row, col, offset:offset + 3] = (fit.params[1], *fit.conf_int()[1])
+                    pvalues[row, col, test] = fit.pvalues[1]
+            # One family per trend map, including all complete land and ocean cells.
+            flags = np.zeros(valid.shape, dtype=np.uint8)
+            for test in range(2):
+                raw = pvalues[:, :, test][valid]
+                assert np.isfinite(raw).all()
+                passed = false_discovery_control(raw, method="bh") <= 0.05
+                flags[valid] |= passed.astype(np.uint8) << test
+                print(start, ("local", "relative")[test], int(passed.sum()), "of", len(raw), flush=True)
+            flags.tofile(DEST / f"significance-{start}.bin")
             records.tofile(DEST / f"cells-{start}.bin")
             metadata[start] = dict(end=END, series=reference.tolist(), stats=trend(reference, years),
                                    complete=int(valid.sum()), regions={

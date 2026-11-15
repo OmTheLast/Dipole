@@ -85,7 +85,7 @@ gzip -dc raw/gistemp250.nc.gz > raw/gistemp250.nc
 
 The count sums the estimated 2020 residents in 2° cells whose fitted local-minus-global slope is positive. The denominator includes all residents in cells with a complete temperature trend for the selected period. A separate count uses only cells whose pointwise 95% lower bound exceeds zero. Short records can give overly narrow intervals. Counts are estimates of residential exposure to a regional trend.
 
-We add the GHS-POP 30 arc-second pixel counts by pixel centre, wrapping longitudes at the dateline. For India we apply the Natural Earth v5.1.2 country boundary at the population raster’s resolution before summing. Border counts depend on that boundary. The browser displays rounded results. The calculation uses unrounded population weights.
+We add the GHS-POP 30 arc-second pixel counts by pixel centre, wrapping longitudes at the dateline. For each country or territory we apply the Natural Earth v5.1.2 country boundary at the population raster’s resolution before summing. Border counts depend on that boundary. The browser displays rounded results. The calculation uses unrounded population weights.
 
 From the repository root, install the analysis requirements, then rebuild with the following commands.
 
@@ -95,3 +95,5 @@ unzip -o raw/pop2020.zip '*.tif' -d raw
 curl -fL --retry 2 -o raw/ne_10m_admin_0_countries_ind.geojson https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson
 .venv/bin/python analysis/population.py
 ```
+
+The map can display population dots using the same 2020 counts, clipped to the selected country. Significance crosses use separate two-sided Benjamini–Hochberg tests at 5% for each trend mode and period, over complete cells. The site matches a permitted browser position against local country polygons. Rebuild those outlines after population data with `python3 analysis/location_borders.py`.

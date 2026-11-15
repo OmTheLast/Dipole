@@ -47,3 +47,7 @@ figcaption, .waterLinks {color:var(--muted); font-size:13px}
 .waterPanel button[aria-pressed=true] {background:var(--ocean); border-color:var(--ocean); color:var(--foam)}
 #waterYear {accent-color:var(--ocean)}
 .waterControls select {border-radius:8px}
+
+.waterNav {display:flex;align-items:center;gap:6px;margin:6px 0;font-size:13px;color:var(--mist)}
+#waterMap.pannable {cursor:grab;touch-action:none}
+#waterMap.pannable:active {cursor:grabbing}

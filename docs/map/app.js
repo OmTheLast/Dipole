@@ -4,13 +4,43 @@ const $ = id => document.getElementById(id);
 const map = $("map");
 const plot = $("plot");
 const cols = 180, rows = 90;
-// The page opens on the warming-hole finding: 1900–2025, relative to global, North Atlantic.
-let firstYear = 1900, years, stride, mode = "relative", periods, period, land;
+const entry = new URLSearchParams(location.search);
+let firstYear = entry.get("start") === "1980" ? 1980 : 1900;
+let years, stride, mode = "relative", periods, period, land;
 let byYear = false, selectedYear = 2015, scrubFrame;
 let fitLine, requestedYear = firstYear;
-let activeCase = "hole";
+let activeCase = firstYear === 1900 ? "hole" : null;
 const files = new Map();
 const colors = [[33,89,129], [141,188,203], [243,238,219], [228,154,99], [164,57,47]];
+let overlayCounts, significance;
+const sigToggle = $("sigToggle");
+sigToggle.checked = entry.get("crosses") === "1";
+const testBit = () => mode === "relative" ? 2 : 1;
+function crossesVisible() {
+  return significance && !byYear && sigToggle.checked;
+}
+function cellSignificance(cell) {
+  if (!Number.isFinite(cells[cell * stride])) return "Map-wide check: incomplete record.";
+  return significance[cell] & testBit() ? "× Passes the map-wide check." : "Does not pass the map-wide check.";
+}
+function updateSignificanceKey() {
+  sigToggle.disabled = byYear || !significance;
+  let caption = "";
+  if (byYear) caption = "Available in Trend view.";
+  else if (!significance) caption = "Marker data unavailable for this period.";
+  else if (sigToggle.checked) {
+    const bit = testBit();
+    const count = significance.reduce((sum, flag) => sum + Number(Boolean(flag & bit)), 0);
+    const test = mode === "relative" ? "a difference from global warming" : "a local trend";
+    caption = count.toLocaleString("en-US") + " of " + period.complete.toLocaleString("en-US") +
+      " complete cells pass the check for " + test + " (5% false discovery rate).";
+  }
+  $("sigCaption").textContent = caption;
+}
+sigToggle.addEventListener("change", () => {
+  updateSignificanceKey();
+  if (selected) show(selected, false);
+});
 let population, cells, coverage, regions, base, selected, series, selectedBounds;
 // Colour limits (°C/decade) chosen per view so that roughly the largest 2% of cells saturate.
 // One fixed ±1 scale washed out the long-period differences, which are about ±0.1.
@@ -22,27 +52,19 @@ const cases = {
 };
 const fmt = (n, digits = 2) => (n < 0 ? "−" : "+") + Math.abs(n).toFixed(digits);
 function storyText(name) {
-  const r80 = periods[1980].regions, r00 = periods[1900].regions;
-  const range = r => fmt(r.relative[1]) + " to " + fmt(r.relative[2]);
+  const recent = periods[1980].regions, long = periods[1900].regions;
   if (name === "hole") {
-    const na = r00["North Atlantic"], na80 = r80["North Atlantic"];
-    return "Since 1900 the ocean south of Greenland warmed " + fmt(na.stats[0]) +
-      " °C/decade while the world warmed " + fmt(na.globalRate) + ". That puts it " + fmt(na.relative[0]) +
-      " °C/decade relative to the globe (95% interval " + range(na) + "). The ten most below-global cells on the 1900–2025 map all sit in this box. " +
-      "Over 1980–2025 the same box is " + fmt(na80.relative[0]) + " (interval " + range(na80) +
-      "), so the hole is a long-run feature that a 45-year window cannot resolve.";
+    const sea = long["North Atlantic"];
+    return "Since 1900, the ocean south of Greenland warmed by " + sea.stats[0].toFixed(2) +
+      " °C per decade. The world warmed by " + sea.globalRate.toFixed(2) +
+      " °C per decade. Switch to 1980–2025 to see whether that gap holds over the shorter record.";
   }
-  if (name === "arctic") {
-    const a = r80.Arctic;
-    return "Since 1980 the Arctic warmed " + fmt(a.stats[0]) + " °C/decade, " +
-      (a.stats[0] / a.globalRate).toFixed(1) + "× the global " + fmt(a.globalRate) + ". The gap is " +
-      fmt(a.relative[0]) + " °C/decade (95% interval " + range(a) + "). Same planet, same years, very different rates.";
-  }
-  const a = r00.Arctic, a80 = r80.Arctic;
-  return "Fitted over " + a.fitStart + "–2025 (the Arctic record has a gap in " + (a.fitStart - 1) +
-    "), the Arctic runs only " + fmt(a.relative[0]) + " °C/decade above the globe (interval " + range(a) + "), against " +
-    fmt(a80.relative[0]) + " since 1980. The chart shows why: a warm Arctic spell in the 1930s–40s flattens the long-run line. " +
-    "Most of the excess Arctic warming is recent.";
+  const arctic = recent.Arctic;
+  if (name === "arctic") return "Since 1980, the Arctic warmed at " +
+    (arctic.stats[0] / arctic.globalRate).toFixed(1) + " times the global rate. Compare the Arctic and world lines in the chart.";
+  return "The Arctic’s complete regional record starts in " + long.Arctic.fitStart +
+    ". Over that longer period it warmed at " + (long.Arctic.stats[0] / long.Arctic.globalRate).toFixed(1) +
+    " times the global rate. Switch to 1980–2025 to compare.";
 }
 const changeText = n => (n < 0 ? "−" : "+") + Math.abs(n).toFixed(2);
 const latText = v => Math.abs(v) + "°" + (v > 0 ? "N" : v < 0 ? "S" : "");
@@ -143,16 +165,27 @@ function contextFor(canvas) {
 // Positions and viewport offsets are fractions of the full world image.
 const viewport = {left: 0, top: 0, zoom: 1};
 const maxZoom = 8;
+const wrapWorld = x => x - Math.floor(x);
 function positionView(left, top) {
   const limit = 1 - 1 / viewport.zoom;
-  viewport.left = clamp(left, 0, limit);
+  viewport.left = wrapWorld(left);
   viewport.top = clamp(top, 0, limit);
 }
 function drawMap(bounds) {
   const {ctx, width:w, height:h} = contextFor(map);
   const {left, top, zoom} = viewport;
   ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(base, left * base.width, top * base.height, base.width / zoom, base.height / zoom, 0, 0, w, h);
+  const copies = left + 1 / zoom > 1 ? [left, left-1] : [left];
+  for (const origin of copies) {
+    ctx.drawImage(base, -origin*w*zoom, -top*h*zoom, w*zoom, h*zoom);
+  }
+  for (const origin of copies) {
+    if (overlayCounts) drawPopulation(ctx, w, h, origin);
+    if (crossesVisible()) drawCrosses(ctx, w, h, origin);
+    drawSelection(ctx, bounds, w, h, origin, top, zoom);
+  }
+}
+function drawSelection(ctx, bounds, w, h, left, top, zoom) {
   const [s,n,west,east] = bounds;
   const x=((west+180)/360-left)*w*zoom, y=((90-n)/180-top)*h*zoom;
   const bw=(east-west)*w*zoom/360, bh=(n-s)*h*zoom/180;
@@ -166,6 +199,96 @@ function drawMap(bounds) {
     ctx.strokeStyle="#183c35"; ctx.lineWidth=1.8; ctx.stroke();
   }
 }
+function drawCrosses(ctx, width, height, left) {
+  const cellWidth = width * viewport.zoom / cols, cellHeight = height * viewport.zoom / rows;
+  const size = Math.min(cellWidth, cellHeight);
+  const arm = Math.min(2.5, size * .17);
+  const bit = testBit();
+  ctx.beginPath();
+  for (let row = 0; row < rows; row++) {
+    // Upper-right of the cell, leaving its centre for the population dot.
+    const y = ((rows - row - .80) / rows - viewport.top) * height * viewport.zoom;
+    if (y < -arm || y > height + arm) continue;
+    for (let col = 0; col < cols; col++) {
+      if (!(significance[row * cols + col] & bit)) continue;
+      const x = ((col + .80) / cols - left) * width * viewport.zoom;
+      if (x < -arm || x > width + arm) continue;
+      ctx.moveTo(x - arm, y - arm); ctx.lineTo(x + arm, y + arm);
+      ctx.moveTo(x - arm, y + arm); ctx.lineTo(x + arm, y - arm);
+    }
+  }
+  ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.lineWidth = Math.min(2.4, size * .22); ctx.stroke();
+  ctx.strokeStyle = "#372042"; ctx.lineWidth = Math.min(1.25, size * .12); ctx.stroke();
+}
+function drawPopulation(ctx, width, height, left) {
+  const cellWidth = width * viewport.zoom / cols;
+  const cellHeight = height * viewport.zoom / rows;
+  const scale = Math.min(cellWidth, cellHeight, 18);
+  ctx.fillStyle = "#17283b";
+  ctx.strokeStyle = "rgba(255,255,255,.85)";
+  ctx.lineWidth = Math.min(1, scale * .09);
+  ctx.beginPath();
+  for (let row = 0; row < rows; row++) {
+    const y = ((rows - row - .5) / rows - viewport.top) * height * viewport.zoom;
+    if (y < -scale || y > height + scale) continue;
+    for (let col = 0; col < cols; col++) {
+      const count = overlayCounts[row * cols + col];
+      if (!count) continue;
+      const x = ((col + .5) / cols - left) * width * viewport.zoom;
+      if (x < -scale || x > width + scale) continue;
+      const fraction = count >= 1e7 ? .44 : count >= 1e6 ? .32 : count >= 1e5 ? .22 : .11;
+      const radius = Math.max(.45, scale * fraction);
+      ctx.moveTo(x + radius, y);
+      ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    }
+  }
+  ctx.fill();
+  ctx.stroke();
+}
+
+function overlayReading(cell) {
+  const scope = $("mapPopulation").selectedOptions[0].textContent;
+  return "2020 residents (" + scope + "): " + (overlayCounts[cell] || 0).toLocaleString("en-US");
+}
+
+function setPopulationLayer(scope) {
+  $("mapPopulation").value = scope;
+  $("populationKey").hidden = !scope;
+  const isCountry = scope && scope !== "world";
+  overlayCounts = isCountry ? population.countryCells[scope] : scope ? population.cellResidents : null;
+  if (isCountry) {
+    $("exposureCountry").value = scope;
+    showExposure();
+    // Start at an inhabited cell even for island and overseas territories.
+    const entries = Object.entries(overlayCounts);
+    if (entries.length) {
+      const [cell] = entries.reduce((a, b) => a[1] >= b[1] ? a : b);
+      show({cell: Number(cell)}, false);
+      setZoom(4);
+      positionView((Number(cell) % cols + .5) / cols - .5 / viewport.zoom,
+        1 - (Math.floor(Number(cell) / cols) + .5) / rows - .5 / viewport.zoom);
+    }
+  } else if (scope === "world") {
+    setZoom(1);
+  }
+  $("layerCaption").textContent = "";
+  if (scope) {
+    const name = $("mapPopulation").selectedOptions[0].textContent;
+    $("layerCaption").textContent = "Dots show estimated 2020 residents in each 2° cell (" + name +
+      "). Larger dots mean more people. The background shows temperature.";
+  }
+  tip.hidden = true;
+  show(selected, false);
+}
+
+$("mapPopulation").addEventListener("change", event => setPopulationLayer(event.target.value));
+$("showCountryLayer").addEventListener("click", () => {
+  setPopulationLayer($("exposureCountry").value);
+  document.querySelector(".layers").open = true;
+  $("mapPopulation").focus();
+  $("populationMap").scrollIntoView();
+});
+
 function drawSeries(values) {
   const {ctx, width:w, height:h} = contextFor(plot);
   const valid = [...values, ...period.series, ...(fitLine?.values || [])].filter(Number.isFinite);
@@ -237,12 +360,14 @@ function show(selection, reveal = true) {
   $("cellResidents").textContent = population && selection.cell !== undefined
     ? "Estimated 2020 residents in this cell: " + population.cellResidents[selection.cell].toLocaleString("en-US")
     : "";
+  if (overlayCounts && selection.cell !== undefined) $("cellResidents").textContent = overlayReading(selection.cell);
+  $("cellSig").textContent = crossesVisible() && selection.cell !== undefined ? cellSignificance(selection.cell) : "";
   selectedBounds=bounds;
   if (reveal && viewport.zoom > 1) {
     const centerX = ((bounds[2] + bounds[3]) / 2 + 180) / 360;
     const centerY = (90 - (bounds[0] + bounds[1]) / 2) / 180;
     const span = 1 / viewport.zoom;
-    if (centerX < viewport.left || centerX > viewport.left + span ||
+    if (wrapWorld(centerX - viewport.left) > span ||
         centerY < viewport.top || centerY > viewport.top + span)
       positionView(centerX - span / 2, centerY - span / 2);
   }
@@ -268,7 +393,29 @@ function show(selection, reveal = true) {
     return row;
   }));
   plot.setAttribute("aria-label","Annual anomalies for "+name+". Values available in the table below.");
+  updateMapReading();
   drawMap(bounds); drawSeries(series);
+}
+function updateMapReading() {
+  $("mapReading").hidden = false;
+  $("readingPlace").textContent = selected.region || "Selected cell · " + $("name").textContent;
+  let reading;
+  if (byYear) {
+    const value = series[selectedYear - firstYear];
+    reading = Number.isFinite(value) ? selectedYear + " was " + fmt(value) +
+      " °C relative to the 1951–1980 average here." : "There are too few observations for " + selectedYear + ".";
+  } else {
+    const offset = mode === "relative" ? 3 : 0;
+    const place = selected.region && regions[selected.region];
+    const stats = place ? (offset ? place.relative : place.stats) : cells.subarray(selected.cell * stride + offset, selected.cell * stride + offset + 3);
+    const span = (place ? place.fitStart : firstYear) + "–" + period.end;
+    if (!stats || !Number.isFinite(stats[0])) reading = "There are too few complete years to estimate a trend here.";
+    else if (offset) reading = span + " · " + (stats[1] > 0 ? "The temperature rose faster here than worldwide."
+      : stats[2] < 0 ? "The local warming rate was below the global rate." : "The record is too uncertain to tell whether this place warmed faster or slower than the world.");
+    else reading = span + " · " + (stats[1] > 0 ? "This place warmed" : stats[2] < 0 ? "This place cooled" : "The direction of change is uncertain") +
+      " (estimated rate " + fmt(stats[0]) + " °C per decade).";
+  }
+  $("readingText").textContent = reading;
 }
 function showAnnualDetails() {
   const i = selectedYear - firstYear;
@@ -279,7 +426,7 @@ function showAnnualDetails() {
   $("change").textContent = available ? changeText(value) + " °C" : "Missing estimate";
   $("change").style.color = available && value < 0 ? "#215981" : "";
   $("rate").textContent = "";
-  $("reference").textContent = "Global anomaly: " + changeText(period.series[i]) + " °C";
+  $("reference").textContent = "World temperature difference from its 1951–1980 average: " + changeText(period.series[i]) + " °C";
   $("interval").textContent = "";
   $("explain").textContent = available ? "" : "Too little coverage for an annual estimate here.";
   $("sparse").textContent = "";
@@ -292,7 +439,7 @@ function showTrendDetails(stats, relative, fitStart, globalRate, cell) {
   const fitPeriod = fitStart + "–" + period.end;
   $("coverage").textContent = count + " of " + years + " annual estimates available." +
     (valid && fitStart !== firstYear ? " Continuous record used for both trends: " + fitPeriod + "." : "");
-  $("metricLabel").textContent = showGap ? "Local minus global trend" : "Estimated local change" + (valid ? " · " + fitPeriod : "");
+  $("metricLabel").textContent = showGap ? "Difference from the global warming rate" : "Estimated local change" + (valid ? " · " + fitPeriod : "");
   const scale = showGap ? 1 : (period.end - fitStart) / 10;
   const units = showGap ? " °C/decade" : " °C";
   $("change").textContent = valid ? changeText(rate * scale) + units : "Incomplete record";
@@ -333,27 +480,33 @@ function setZoom(zoom, x = 0.5, y = 0.5) {
   const delta = 1 / oldZoom - 1 / viewport.zoom;
   positionView(viewport.left + x * delta, viewport.top + y * delta);
   map.classList.toggle("zoomed", viewport.zoom > 1);
-  $("zoomLevel").textContent = viewport.zoom + "×";
-  $("zoomOut").disabled = $("worldView").disabled = viewport.zoom === 1;
+  $("zoomLevel").textContent = Number(viewport.zoom.toFixed(1)) + "×";
+  $("zoomOut").disabled = viewport.zoom === 1;
+  $("worldView").disabled = viewport.zoom === 1 && viewport.left === 0;
   $("zoomIn").disabled = viewport.zoom === maxZoom;
   tip.hidden = true;
   drawMap(selectedBounds);
 }
 $("zoomIn").onclick = () => {
   const [south, north, west, east] = selectedBounds;
-  const x = (((west + east) / 2 + 180) / 360 - viewport.left) * viewport.zoom;
+  const x = wrapWorld(((west + east) / 2 + 180) / 360 - viewport.left) * viewport.zoom;
   const y = ((90 - (south + north) / 2) / 180 - viewport.top) * viewport.zoom;
   const visible = x >= 0 && x <= 1 && y >= 0 && y <= 1;
   setZoom(viewport.zoom * 2, visible ? x : 0.5, visible ? y : 0.5);
 };
 $("zoomOut").onclick = () => setZoom(viewport.zoom / 2);
-$("worldView").onclick = () => setZoom(1);
+$("worldView").onclick = () => {
+  setZoom(1);
+  positionView(0,0);
+  $("worldView").disabled = true;
+  drawMap(selectedBounds);
+};
 
 function pointerCell(event, rect) {
   const x = (event.clientX - rect.left) / rect.width;
   const y = (event.clientY - rect.top) / rect.height;
   return cellAt(90 - 180 * (viewport.top + y / viewport.zoom),
-    -180 + 360 * (viewport.left + x / viewport.zoom));
+    -180 + 360 * wrapWorld(viewport.left + x / viewport.zoom));
 }
 function hoverCell(event, rect) {
   const cell = pointerCell(event, rect);
@@ -362,15 +515,17 @@ function hoverCell(event, rect) {
   const metric = byYear ? selectedYear + " anomaly" : mode === "relative" ? "Local − global" : "Local trend";
   const reading = Number.isFinite(value) ? fmt(value) + (byYear ? " °C" : " °C/decade") : $("missingLabel").textContent;
   tip.textContent = latText(lat) + " · " + lonText(lon) + "\n" + metric + "  " + reading;
+  if (crossesVisible()) tip.textContent += "\n" + cellSignificance(cell);
+  if (overlayCounts) tip.textContent += "\n" + overlayReading(cell);
   tip.hidden = false;
   tip.style.left = clamp(event.clientX - rect.left + 12, 0, rect.width - tip.offsetWidth) + "px";
   tip.style.top = clamp(event.clientY - rect.top + 12, 0, rect.height - tip.offsetHeight) + "px";
 }
 map.addEventListener("wheel", event => {
-  if (!selectedBounds || (!event.ctrlKey && document.activeElement !== map) || !event.deltaY) return;
+  if (!selectedBounds || !event.deltaY) return;
   event.preventDefault();
   const rect = map.getBoundingClientRect();
-  setZoom(viewport.zoom * (event.deltaY < 0 ? 2 : 0.5),
+  setZoom(viewport.zoom * Math.exp(-clamp(event.deltaY * (event.deltaMode === 1 ? 16 : 1), -300, 300) * .004),
     (event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.height);
 }, {passive: false});
 map.addEventListener("pointerdown", event => {
@@ -386,10 +541,11 @@ map.addEventListener("pointermove", event => {
     if (event.pointerType !== "touch") hoverCell(event, rect);
     return;
   }
+  if (event.pointerId !== drag.id) return;
   const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
   if (!drag.moved && Math.hypot(dx, dy) < 4) return;
   drag.moved = true;
-  if (viewport.zoom === 1) return;
+  $("worldView").disabled = false;
   map.classList.add("dragging");
   positionView(drag.left - dx / (rect.width * viewport.zoom), drag.top - dy / (rect.height * viewport.zoom));
   drawMap(selectedBounds);
@@ -483,10 +639,13 @@ const people = new Intl.NumberFormat("en-US", {notation: "compact", maximumFract
 function showExposure() {
   if (!population || !period) return;
   const groups = population.periods[firstYear];
+  const code = $("exposureCountry").value;
+  const name = population.countries[code];
+  const country = groups.countries[code];
   $("exposureCaption").textContent = "Estimated 2020 residents, classified by " + firstYear + "–" + period.end + " temperature trends.";
   $("exposureData").hidden = false;
   const rows = [];
-  for (const [label, counts] of [["India", groups.india], ["World", groups.world]]) {
+  for (const [label, counts] of [[name, country], ["World", groups.world]]) {
     const row = document.createElement("tr");
     const title = document.createElement("th");
     title.scope = "row";
@@ -501,14 +660,18 @@ function showExposure() {
     rows.push(row);
   }
   $("exposureRows").replaceChildren(...rows);
-  const share = 100 * groups.india.faster / groups.india.valid;
-  $("indiaFasterBar").style.width = share + "%";
-  $("indiaFasterLabel").textContent = share.toFixed(1) + "% faster than global";
-  $("indiaOtherLabel").textContent = (100 - share).toFixed(1) + "% at or below global";
+  $("countryBarCaption").textContent = "Residents in " + name + " with a temperature trend";
+  const share = country.valid ? 100 * country.faster / country.valid : null;
+  $("countryFasterBar").parentElement.hidden = share === null;
+  $("countryFasterBar").style.width = (share ?? 0) + "%";
+  $("countryFasterLabel").textContent = share === null ? "No residents have a complete trend for this period."
+    : share.toFixed(1) + "% faster than global";
+  $("countryOtherLabel").textContent = share === null ? "" : (100 - share).toFixed(1) + "% at or below global";
   $("exposureIntervals").textContent = "";
 }
 
 function render(reveal = false) {
+  if (!byYear) yearPlayer.stop();
   tip.hidden = true;
   $("zoomIn").disabled = viewport.zoom === maxZoom;
   for (const button of $("periods").querySelectorAll("button"))
@@ -536,14 +699,16 @@ function render(reveal = false) {
   $("story").hidden = !activeCase;
   $("missingLabel").textContent = byYear ? "Missing this year" : "Incomplete record";
   map.setAttribute("aria-label", "World temperature " + (byYear ? "anomaly" : "trend") + " map. Click a cell or move with the arrow keys.");
-  $("legendText").textContent = byYear ? "Temperature above or below the 1951–1980 average" : mode === "relative" ? "Local minus global · blue below global, red above" : "Temperature trend";
+  $("legendText").textContent = byYear ? "Temperature above or below the 1951–1980 average" : mode === "relative" ? "Warming rate compared with the world · blue below, red above" : "Temperature trend";
+  updateSignificanceKey();
   makeMap(land);
   regionalTable();
   showExposure();
-  show(selected || {region: cases[activeCase]?.region || "Arctic"}, reveal);
+  show(selected || {region: "North Atlantic"}, reveal);
 }
 
 async function selectPeriod(start, reveal = false) {
+  yearPlayer.stop();
   requestedYear = start;
   $("status").textContent = "Loading " + start + "–2025…";
   try {
@@ -555,10 +720,15 @@ async function selectPeriod(start, reveal = false) {
       }).then(async data => {
         const marks = new Uint8Array(await get("coverage-" + start + ".bin").then(r => r.arrayBuffer()));
         if (marks.length !== cols * rows) throw Error("Incomplete coverage file");
-        return {data, marks};
+        let flags = null;
+        try {
+          const bytes = new Uint8Array(await get("significance-" + start + ".bin").then(r => r.arrayBuffer()));
+          if (bytes.length === cols * rows && bytes.every(v => v <= 3)) flags = bytes;
+        } catch { /* Temperature and population still work without the optional overlay. */ }
+        return {data, marks, flags};
       }).catch(error => { files.delete(start); throw error; }));
     }
-    const {data, marks} = await files.get(start);
+    const {data, marks, flags} = await files.get(start);
     if (requestedYear !== start) return;
     firstYear = start;
     period = periods[start];
@@ -567,6 +737,7 @@ async function selectPeriod(start, reveal = false) {
     regions = period.regions;
     cells = data;
     coverage = marks;
+    significance = flags;
     render(reveal);
     $("status").textContent = "";
   } catch {
@@ -591,6 +762,7 @@ $("year").addEventListener("input", () => {
     makeMap(land);
     drawMap(selectedBounds);
     showAnnualDetails();
+    updateMapReading();
     drawSeries(series);
     regionalTable();
   });
@@ -609,15 +781,27 @@ $("modes").addEventListener("click", event => {
 
 async function loadPopulation() {
   try {
-    population = await get("population-2020.json").then(r => r.json());
+    population = await get("population-2020.json?v=population-overlay").then(r => r.json());
+    const selector = $("exposureCountry");
+    const entries = Object.entries(population.countries).sort((a, b) => a[1].localeCompare(b[1], "en"));
+    selector.replaceChildren(...entries.map(([code, name]) => new Option(name, code)));
+    const country = entry.get("country");
+    selector.value = Object.hasOwn(population.countries, country) ? country : "IND";
+    $("layerCountries").replaceChildren(...entries.map(([code, name]) => new Option(name, code)));
+    selector.addEventListener("change", () => {
+      if ($("mapPopulation").value && $("mapPopulation").value !== "world") setPopulationLayer(selector.value);
+      else showExposure();
+    });
     showExposure();
     if (selected) show(selected, false);
   } catch {
     $("exposureCaption").textContent = "The population estimates could not load. Reload to try again.";
   }
 }
+const yearPlayer = timelinePlayer($("playYears"), $("year"));
+
 async function load() {
-  loadPopulation();
+  const peopleReady = loadPopulation();
   [periods, land] = await Promise.all([
     get("periods.json").then(r => r.json()), get("land.json").then(r => r.json())
   ]);
@@ -626,6 +810,18 @@ async function load() {
   $("periods").disabled = false;
   $("modes").disabled = false;
   await selectPeriod(firstYear);
+  await peopleReady;
+  if (selectedBounds && population?.countryCells) {
+    $("mapPopulation").disabled = false;
+    $("showCountryLayer").disabled = false;
+    document.dispatchEvent(new Event("population-ready"));
+    if (entry.get("layer") === "population") {
+      document.querySelector(".layers").open = true;
+      setPopulationLayer($("exposureCountry").value);
+    }
+  }
+  document.body.dataset.explorerReady = "true";
+  document.dispatchEvent(new Event("explorer-ready"));
 }
 load().catch(() => { $("status").textContent = "The map data could not load. Reload the page to try again."; });
 

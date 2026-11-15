@@ -30,11 +30,15 @@ def annual_series(grid, times, bounds):
     return monthly.reshape(-1, 12).mean(axis=1), coverage.reshape(-1, 12).min(axis=1)
 
 
-def trend(values, years=YEARS):
+def fit_trend(values, years):
     # Center the year and express time in decades. Gaps would retain their actual dates.
     design = add_constant((years - years.mean()) / 10)
-    fit = OLS(values, design, missing="drop").fit(cov_type="HAC", use_t=True,
+    return OLS(values, design, missing="drop").fit(cov_type="HAC", use_t=True,
                  cov_kwds={"maxlags": 3, "use_correction": True})
+
+
+def trend(values, years=YEARS):
+    fit = fit_trend(values, years)
     return (fit.params[1], *fit.conf_int()[1])
 
 

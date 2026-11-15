@@ -46,8 +46,10 @@ async function loadWater() {
   const latest = seasons.filter(s => s.mean !== null).at(-1);
   slider.value = latest.year;
   slider.oninput = readYear;
+  const player = timelinePlayer(node("playWater"), slider);
   for (const button of document.querySelectorAll("[data-year]")) {
     button.onclick = () => {
+      player.stop();
       slider.value = button.dataset.year;
       readYear();
     };
@@ -69,6 +71,7 @@ async function loadWater() {
   node("waterSensitivity").textContent = "We do not report a fitted rate. A straight-line fit through " + fit.n + " seasons gave " + number(fit.slope) + " to " +
     number(fit.sen) + " cm per decade depending on the method, and the strong year-to-year persistence makes any single rate and interval unreliable.";
   node("waterData").hidden = false;
+  document.dispatchEvent(new Event("water-ready"));
   try {
     paintMap = await loadMap();
     readYear();

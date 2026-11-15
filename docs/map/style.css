@@ -207,3 +207,33 @@ footer { display: grid; gap: 4px; padding: 32px 0 48px; border-top: 1px solid va
   #details, .history, .kind { padding-inline: 16px }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important } }
+
+.action, #showCountryLayer, #geoCountry, .guide button, .guide a {display:inline-flex; align-items:center; justify-content:center; gap:6px; border:1px solid var(--ocean-line); border-radius:8px; padding:8px 14px; background:var(--ocean); color:white; font:inherit; font-weight:650; font-size:14px; cursor:pointer; text-decoration:none}
+#restartTour,.deep .play {background:var(--ice);color:var(--ocean)}
+#restartTour {margin-top:16px}
+.play {min-width:78px;flex-shrink:0}
+.layers {margin-bottom:12px;border-bottom:1px solid var(--ocean-line);padding-bottom:10px}
+.layerControls {padding:10px 0;font-size:14px}
+.layerControls select,.populationCountry select {max-width:100%;padding:7px;border-radius:6px}
+.layerControls a {margin-left:8px}
+.sigControl {display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:10px}
+#sigCaption,#layerCaption,.dotKey {color:var(--haze);font-size:13px}
+.dotKey,.dotKey span {display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.dotKey {gap:12px}.dotKey i {width:3px;height:3px;border-radius:50%;background:var(--foam)}
+.dotKey span:nth-child(2) i {width:5px;height:5px}.dotKey span:nth-child(3) i {width:8px;height:8px}.dotKey span:nth-child(4) i {width:11px;height:11px}
+#mapReading {padding:10px 14px;margin:10px 0;background:#1c3d59;border-left:3px solid var(--ice);font-size:14px}
+#mapReading strong {display:block}#mapReading a {margin-left:5px;white-space:nowrap}
+.coordinateLookup {margin-top:12px}.populationCountry {display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 8px 6px 0}
+#geoStatus {margin:6px 0 20px;font-size:14px;color:var(--mist)}
+.guide {box-sizing:border-box;width:100%;max-width:810px;margin:14px 0;padding:16px 20px;border:1px solid #78afc9;border-left:5px solid #3c89ad;border-radius:12px;background:#f0f8fc;color:var(--ink);scroll-margin:12px}
+.guide[hidden] {display:none}.guide h2 {margin:2px 0;font-size:clamp(19px,2vw,24px);line-height:1.2}.guide .guideText {color:#344e62;font-size:15px;max-width:70ch}
+.guide small {font-size:12px;font-weight:650;color:#526c7e}.guideActions {display:flex;align-items:center;gap:7px;margin-top:10px;flex-wrap:wrap}
+.guide button.secondary {background:transparent;color:var(--ink);border-color:#b0c4cf}.guide button:last-child {margin-left:auto}
+.guideTarget {outline:2px solid #72b2d0;outline-offset:3px;scroll-margin:10px}
+#guideHome {padding:1px 0}
+@media(max-width:640px){.guide {padding:12px}.guideActions {gap:5px}.layerControls a {display:block;margin:5px 0}.populationCountry {display:flex}.top nav {gap:8px}}
+[hidden] {display:none!important}
+
+#map {cursor:grab;touch-action:pan-y}
+#map.zoomed {touch-action:none}
+#map.dragging {cursor:grabbing}
