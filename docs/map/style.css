@@ -106,6 +106,9 @@ canvas { display: block; width: 100% }
 
 .legend { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; margin-top: 14px; font-size: 13px; color: var(--haze) }
 .legendscale { display: flex; align-items: center; gap: 12px }
+.colourKey {max-width:100%}
+.colourKey .legendscale {flex-wrap:wrap;row-gap:4px}
+#relativeLegend {margin-top:5px;color:var(--foam)}
 .legendtitle { color: var(--foam) }
 #legendUnits { color: var(--haze) }
 .scale { width: 190px }

@@ -572,9 +572,21 @@ function hoverCell(event, rect) {
   const cell = pointerCell(event, rect);
   const value = cells[cell * stride + mapField()];
   const lat = -89 + 2 * Math.floor(cell / cols), lon = -179 + 2 * (cell % cols);
-  const metric = byYear ? selectedYear + " anomaly" : mode === "relative" ? "Local − global" : "Local trend";
-  const reading = Number.isFinite(value) ? fmt(value) + (byYear ? " °C" : " °C/decade") : $("missingLabel").textContent;
-  tip.textContent = latText(lat) + " · " + lonText(lon) + "\n" + metric + "  " + reading;
+  let reading = $("missingLabel").textContent;
+  if (Number.isFinite(value)) {
+    if (!byYear && mode === "relative") {
+      const local = cells[cell * stride];
+      const magnitude = rate => Math.abs(rate) < 0.005 ? "less than 0.01" : Math.abs(rate).toFixed(2);
+      const localReading = local === 0 ? "No estimated local change." :
+        "This square " + (local > 0 ? "warmed" : "cooled") + " by " + magnitude(local) + " °C per decade.";
+      const gap = value === 0 ? "The local rate matched the world’s." :
+        "Its rate was " + magnitude(value) + " °C per decade " + (value > 0 ? "above" : "below") + " the world’s rate.";
+      reading = localReading + "\n" + gap;
+    } else {
+      reading = byYear ? selectedYear + " anomaly  " + fmt(value) + " °C" : "Local trend  " + fmt(value) + " °C/decade";
+    }
+  }
+  tip.textContent = latText(lat) + " · " + lonText(lon) + "\n" + reading;
   if (crossesVisible()) tip.textContent += "\n" + cellSignificance(cell);
   if (overlayCounts) tip.textContent += "\n" + overlayReading(cell);
   tip.hidden = false;
@@ -768,7 +780,8 @@ function render(reveal = false) {
   $("story").hidden = !activeCase;
   $("missingLabel").textContent = byYear ? "Grey · missing this year" : "Grey · record has gaps";
   map.setAttribute("aria-label", "World temperature " + (byYear ? "anomaly" : "trend") + " map. Select a grid square or move with the arrow keys.");
-  $("legendText").textContent = byYear ? "Temperature above or below the 1951–1980 average" : mode === "relative" ? "Warming rate compared with the world · blue below, red above" : "Local temperature trend · blue cooled, red warmed";
+  $("relativeLegend").hidden = byYear || mode !== "relative";
+  $("legendText").textContent = byYear ? "Temperature above or below the 1951–1980 average" : mode === "relative" ? "Warming rate compared with the world" : "Local temperature trend · blue cooled, red warmed";
   updateSignificanceKey();
   makeMap(land);
   regionalTable();

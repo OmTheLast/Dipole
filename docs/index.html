@@ -8,9 +8,9 @@
 <title>Dipole · Same planet, opposite trends</title>
 <meta name="description" content="Explore how surface temperature changed at every place on Earth since 1900, using NASA’s GISTEMP record.">
 <link rel="preload" href="fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="map/style.css?v=city-location-1">
+<link rel="stylesheet" href="map/style.css?v=rate-key-1">
 <script src="map/player.js?v=2" defer></script>
-<script src="map/app.js?v=first-view-1" defer></script>
+<script src="map/app.js?v=rate-key-1" defer></script>
 <script src="map/location.js?v=city-location-1" defer></script>
 <script src="map/tour.js?v=phone-guide-1" defer></script>
 </head>
@@ -37,7 +37,7 @@
 </div>
 <div class="maparea"><canvas id="map" tabindex="0" aria-describedby="mapHint" aria-label="World temperature map"></canvas><div id="cellTip" hidden></div></div>
 <div id="mapReading" aria-live="polite" hidden><strong id="readingPlace"></strong><span id="readingText"></span> <a href="#details">See the evidence ↓</a></div>
-<div class="legend"><div class="legendscale"><span class="legendtitle"><span id="legendText">Temperature trend</span> <span id="legendUnits">°C / decade</span></span><div class="scale"><div class="gradient"></div><div class="ticks"><span id="scaleLow">≤ −1</span><span>0</span><span id="scaleHigh">≥ +1</span></div></div></div><span class="missing"><i></i> <span id="missingLabel">Incomplete record</span></span><span id="overlayKey" class="overlaykey"><span class="hatchkey"><i></i> 250 km grid has data in fewer than half the months</span></span></div>
+<div class="legend"><div class="colourKey"><div class="legendscale"><span class="legendtitle"><span id="legendText">Temperature trend</span> <span id="legendUnits">°C / decade</span></span><div class="scale"><div class="gradient"></div><div class="ticks"><span id="scaleLow">≤ −1</span><span>0</span><span id="scaleHigh">≥ +1</span></div></div></div><p id="relativeLegend" hidden>Blue areas warmed more slowly than the world or cooled. Red areas warmed faster than the world.</p></div><span class="missing"><i></i> <span id="missingLabel">Incomplete record</span></span><span id="overlayKey" class="overlaykey"><span class="hatchkey"><i></i> 250 km grid has data in fewer than half the months</span></span></div>
 <div class="controls">
 <fieldset id="views" class="segmented" disabled><legend>View</legend><button data-view="trend" aria-pressed="true">Trend</button><button data-view="annual" aria-pressed="false">By year</button></fieldset>
 <fieldset id="periods" class="segmented" disabled><legend>Period</legend><button data-start="1900" aria-pressed="true">1900–2025</button><button data-start="1980" aria-pressed="false">1980–2025</button></fieldset>
