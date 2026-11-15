@@ -8,11 +8,11 @@
 <title>Dipole · Same planet, opposite trends</title>
 <meta name="description" content="Explore how surface temperature changed at every place on Earth since 1900, using NASA’s GISTEMP record.">
 <link rel="preload" href="fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="map/style.css?v=guide-1">
+<link rel="stylesheet" href="map/style.css?v=motion-1">
 <script src="map/player.js?v=2" defer></script>
-<script src="map/app.js?v=guide-1" defer></script>
-<script src="map/location.js?v=1" defer></script>
-<script src="map/tour.js?v=1" defer></script>
+<script src="map/app.js?v=local-area-1" defer></script>
+<script src="map/location.js?v=local-area-1" defer></script>
+<script src="map/tour.js?v=motion-1" defer></script>
 </head>
 <body>
 <div class="deep">
@@ -61,7 +61,7 @@
 <div id="mapReading" aria-live="polite" hidden><strong id="readingPlace"></strong><span id="readingText"></span> <a href="#details">See the evidence ↓</a></div>
 <div class="legend"><div class="legendscale"><span class="legendtitle"><span id="legendText">Temperature trend</span> <span id="legendUnits">°C / decade</span></span><div class="scale"><div class="gradient"></div><div class="ticks"><span id="scaleLow">≤ −1</span><span>0</span><span id="scaleHigh">≥ +1</span></div></div></div><span class="missing"><i></i> <span id="missingLabel">Incomplete record</span></span><span id="overlayKey" class="overlaykey"><span class="hatchkey"><i></i> 250 km grid has data in fewer than half the months</span></span></div>
 <div class="locations"><div class="presets" id="presets"><span class="presetlabel">Jump to</span>
-<button data-region="Arctic">Arctic</button><button data-region="North Atlantic">North Atlantic</button><button data-lat="13.08" data-lon="80.27">Chennai</button></div>
+<button data-region="Arctic">Arctic</button><button data-region="North Atlantic">North Atlantic</button><button type="button" id="geoMap" disabled>My area</button><small id="areaStatus" role="status"></small></div>
 <details class="coordinateLookup"><summary>Find a cell by coordinates</summary><form id="coords"><label>Latitude<input type="number" name="lat" required min="-90" max="90" step="any" placeholder="−90 to 90"></label><label>Longitude<input type="number" name="lon" required min="-180" max="180" step="any" placeholder="−180 to 180"></label><button type="submit">Show cell</button></form></details></div>
 </section>
 
@@ -80,9 +80,8 @@
 <div id="exposureData" hidden>
 <label class="populationCountry" for="exposureCountry">Country or territory <select id="exposureCountry"></select></label>
 <button id="showCountryLayer" type="button" disabled>Show selected country on the map ↑</button>
-<button type="button" id="geoCountry">Use my location</button>
-<button class="action" type="button" id="geoCell" hidden>See the temperature near me</button>
-<p id="geoStatus" role="status">With your permission, your browser can select your country. Your coordinates stay on this device.</p>
+<button type="button" id="geoCountry" disabled>Use my location</button>
+<p id="geoStatus" role="status">Use your location to select your country and zoom to your temperature cell. Your coordinates stay on this device.</p>
 <figure class="populationBar"><figcaption id="countryBarCaption"></figcaption>
 <div class="populationTrack" aria-hidden="true"><span id="countryFasterBar"></span></div>
 <div class="populationLabels"><span id="countryFasterLabel"></span><span id="countryOtherLabel"></span></div></figure>
@@ -96,7 +95,7 @@
 
 <section class="chapter"><div class="chapterhead"><h2>Regions side by side</h2><p id="comparisonCaption"></p></div><div class="scrolltable"><table class="comparison"><thead><tr><th scope="col">Region</th><th scope="col" id="timeHeading">Years fitted</th><th scope="col">Local</th><th scope="col">Global</th><th scope="col">Local − global</th></tr></thead><tbody id="comparison"></tbody></table></div><p id="comparisonNote" class="note"></p></section>
 
-<section class="chapter water-teaser" id="waterIntro"><div class="chapterhead"><h2>Water after the monsoon</h2><p>NASA’s GRACE satellites measure changes in total water storage in northwest India. See how Rajasthan, Punjab, Haryana and Delhi fared after each rainy season since 2002.</p></div><a class="teaserlink" href="water/">Open the water explorer</a></section>
+<section class="chapter water-teaser" id="waterIntro"><div class="chapterhead"><h2>Water after the monsoon</h2><p>The temperature map asks which places warmed faster than the world. Water gives us a different comparison: after the rains, did northwest India and its neighbours hold more or less water than usual? Compare both regions over the same monsoon years.</p></div><a class="teaserlink" href="water/">Open the water explorer</a></section>
 
 <details class="method chapter"><summary>How to read the trends and uncertainty</summary>
 <p>Each trend is the slope of a straight line through annual temperatures relative to the 1951–1980 average. For the global comparison we fit the yearly local minus global differences. A negative difference means a place warmed more slowly than the world or cooled more quickly. The chart shows the two original histories.</p>

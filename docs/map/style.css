@@ -225,13 +225,29 @@ footer { display: grid; gap: 4px; padding: 32px 0 48px; border-top: 1px solid va
 #mapReading strong {display:block}#mapReading a {margin-left:5px;white-space:nowrap}
 .coordinateLookup {margin-top:12px}.populationCountry {display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 8px 6px 0}
 #geoStatus {margin:6px 0 20px;font-size:14px;color:var(--mist)}
-.guide {box-sizing:border-box;width:100%;max-width:810px;margin:14px 0;padding:16px 20px;border:1px solid #78afc9;border-left:5px solid #3c89ad;border-radius:12px;background:#f0f8fc;color:var(--ink);scroll-margin:12px}
-.guide[hidden] {display:none}.guide h2 {margin:2px 0;font-size:clamp(19px,2vw,24px);line-height:1.2}.guide .guideText {color:#344e62;font-size:15px;max-width:70ch}
-.guide small {font-size:12px;font-weight:650;color:#526c7e}.guideActions {display:flex;align-items:center;gap:7px;margin-top:10px;flex-wrap:wrap}
-.guide button.secondary {background:transparent;color:var(--ink);border-color:#b0c4cf}.guide button:last-child {margin-left:auto}
-.guideTarget {outline:2px solid #72b2d0;outline-offset:3px;scroll-margin:10px}
-#guideHome {padding:1px 0}
+/* The tour sits beside the live control; the rest of the page stays usable. */
+.guide {position:fixed;z-index:30;width:min(348px,calc(100% - 16px));padding:14px 16px;
+  border:1px solid #4380a0;border-radius:12px;background:#f4faff;color:var(--ink);
+  box-shadow:0 6px 24px #071d3440;line-height:1.4}
+.guide::after {content:"";position:absolute;left:var(--arrow-x,50%);width:14px;height:14px;
+  border:solid #4380a0;background:#f4faff;pointer-events:none}
+.guide[data-side="above"]::after {bottom:-8px;border-width:0 1px 1px 0;transform:translateX(-50%) rotate(45deg)}
+.guide[data-side="below"]::after {top:-8px;border-width:1px 0 0 1px;transform:translateX(-50%) rotate(45deg)}
+.guide[data-side="away"]::after {display:none}
+.guide h2 {margin:3px 0 5px;font-size:19px;line-height:1.17}
+.guide p {color:#344e62;font-size:14px}
+.guide small {font-size:12px;font-weight:650;color:#526c7e}
+.guideActions {display:flex;align-items:center;gap:7px;margin-top:10px;flex-wrap:wrap}
+.guide button.secondary {background:transparent;color:var(--ink);border-color:#a0b5c1}
+.guide button[data-skip] {margin-left:auto}.guideReturn {margin-top:6px}
+.guideTarget,.guideCompanion {outline:3px solid #ffc34a;outline-offset:3px;box-shadow:0 0 0 7px #102a4380}
+.guideCompanion {outline-width:2px;outline-offset:1px;box-shadow:none}
+@media (prefers-reduced-motion: no-preference) {
+  .guideTarget {animation:guide-ring-in 170ms ease-out}
+  @keyframes guide-ring-in {from {outline-color:transparent} to {outline-color:#ffc34a}}
+}
 @media(max-width:640px){.guide {padding:12px}.guideActions {gap:5px}.layerControls a {display:block;margin:5px 0}.populationCountry {display:flex}.top nav {gap:8px}}
+@media(max-height:420px){.guide {max-height:calc(100dvh - 70px);overflow:auto}.guide h2{font-size:16px}}
 [hidden] {display:none!important}
 
 #map {cursor:grab;touch-action:pan-y}

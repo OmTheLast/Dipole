@@ -382,9 +382,8 @@ function show(selection, reveal = true) {
   } else {
     showTrendDetails(stats, relative, fitStart, globalRate, selection.cell);
   }
-  for (const button of $("presets").querySelectorAll("button")) {
-    button.setAttribute("aria-pressed",String(button.dataset.region ? selection.region===button.dataset.region :
-      selection.cell===cellAt(+button.dataset.lat,+button.dataset.lon)));
+  for (const button of $("presets").querySelectorAll("[data-region]")) {
+    button.setAttribute("aria-pressed",String(selection.region === button.dataset.region));
   }
   $("annual").replaceChildren(...Array.from(series,(v,i)=>{
     const row=document.createElement("tr");
@@ -591,8 +590,8 @@ $("cases").addEventListener("click", event => {
   selectPeriod(story.start, true);
 });
 $("presets").addEventListener("click",e=>{
-  const b=e.target.closest("button"); if (!b) return;
-  show(b.dataset.region ? {region:b.dataset.region} : {cell:cellAt(+b.dataset.lat,+b.dataset.lon)});
+  const button = e.target.closest("[data-region]");
+  if (button) show({region:button.dataset.region});
 });
 $("coords").addEventListener("submit",e=>{
   e.preventDefault();

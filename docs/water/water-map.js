@@ -22,7 +22,7 @@ function color(value) {
 }
 
 export async function loadMap() {
-  const response = await fetch("map.json");
+  const response = await fetch("map.json?v=regions-1");
   if (!response.ok) throw Error("Water map unavailable");
   const {rows, years, states} = await response.json();
   const canvas = document.getElementById("waterMap");
@@ -44,8 +44,13 @@ export async function loadMap() {
   let season;
   let global = false;
   // Include neighboring land for context and retain the same view on every scrub.
-  const home = [65, 22, 84, 34], earth = [-180, -90, 180, 90];
+  const home = [66, 20, 86, 33], earth = [-180, -90, 180, 90];
   let view = home.slice();
+  let outlines = [];
+  function setRegion(code) {
+    outlines = states.filter(state => ["IN-RJ","IN-PB","IN-HR","IN-DL",code].includes(state.code));
+    draw();
+  }
   const bounds = () => view;
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
   function position(west, north, width, height) {
@@ -87,7 +92,7 @@ export async function loadMap() {
     for (const shift of east > 180 ? [0,360] : [0]) {
       const x = lon => (lon+shift-west)*w/span;
       const y = lat => (north - lat) * h / (north - south);
-      for (const state of states) {
+      for (const state of outlines) {
         ctx.beginPath();
         for (const ring of state.rings) {
           ring.forEach(([lon, lat], i) => i ? ctx.lineTo(x(lon), y(lat)) : ctx.moveTo(x(lon), y(lat)));
@@ -103,7 +108,7 @@ export async function loadMap() {
       if (!global) {
         ctx.font = '600 ' + (w < 500 ? 11 : 14) + 'px system-ui';
         ctx.textBaseline = "middle";
-        for (const state of states) {
+        for (const state of outlines) {
           const [lon, lat] = state.center;
           ctx.textAlign = state.name === "Delhi" ? "left" : state.name === "Haryana" ? "right" : "center";
           const dx = state.name === "Delhi" ? 5 : 0;
@@ -195,5 +200,5 @@ export async function loadMap() {
       draw();
     }
   }).observe(canvas);
-  return setYear;
+  return {setYear, setRegion};
 }

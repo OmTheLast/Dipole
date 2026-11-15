@@ -2,26 +2,32 @@
   const button = document.getElementById("geoCountry");
   const status = document.getElementById("geoStatus");
   const countrySelect = document.getElementById("exposureCountry");
-  const localCell = document.getElementById("geoCell");
-  let nearbyCell, geography;
-  localCell.onclick = () => {
-    if (nearbyCell === undefined || !cells) return;
-    byYear = false;
-    activeCase = null;
-    mode = "relative";
-    selected = {cell:nearbyCell};
-    render(true);
+  const mapButton = document.getElementById("geoMap");
+  const areaStatus = document.getElementById("areaStatus");
+  let geography, revision = 0;
+  function report(message) {
+    status.textContent = message;
+    areaStatus.textContent = message;
+  }
+  function selectCell(lat, lon, reveal) {
+    const cell = cellAt(lat, lon);
+    show({cell}, false);
     setZoom(4);
-    const row = Math.floor(nearbyCell / cols), col = nearbyCell % cols;
-    positionView((col+.5)/cols-.5/viewport.zoom,1-(row+.5)/rows-.5/viewport.zoom);
+    const row = Math.floor(cell / cols), col = cell % cols;
+    positionView((col + 0.5) / cols - 0.5 / viewport.zoom, 1 - (row + 0.5) / rows - 0.5 / viewport.zoom);
     drawMap(selectedBounds);
-    $("map").focus({preventScroll:true});
-    $("map").scrollIntoView({block:"center"});
-  };
-  let revision = 0;
-  // A manual selection takes precedence over a pending location request.
+    if (reveal) {
+      $("map").focus({preventScroll:true});
+      $("map").scrollIntoView({block:"center"});
+    }
+  }
+  // A later manual selection wins if the browser or boundaries are slow.
+  document.addEventListener("click", event => {
+    if (event.target.closest("#map, [data-region], #cases button, .guide button")) revision++;
+  });
+  $("coords").addEventListener("submit", () => revision++);
   for (const id of ["exposureCountry", "mapPopulation"]) {
-    document.getElementById(id).addEventListener("change", () => { revision++; localCell.hidden = true; });
+    $(id).addEventListener("change", () => revision++);
   }
   function insideRing(x, y, ring) {
     let inside = false;
@@ -31,47 +37,62 @@
     }
     return inside;
   }
-  async function locate() {
+  async function locate(explicit) {
     if (button.disabled) return;
     if (!navigator.geolocation || !window.isSecureContext) {
-      status.textContent = "Location is available on HTTPS or localhost. You can choose your country above.";
+      report("Location is available on HTTPS or localhost. You can choose a place manually.");
       return;
     }
-    button.disabled = true;
     const request = revision;
-    status.textContent = "Finding your country…";
+    button.disabled = mapButton.disabled = true;
+    report("Finding your area…");
     try {
-      const position = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject,
-        {enableHighAccuracy:false, timeout:12000, maximumAge:300000}));
-      if (!geography) {
-        const response = await fetch("map/country-outlines.json");
-        if (!response.ok) throw Error("Boundary data unavailable");
-        geography = await response.json();
+      const {coords} = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject,
+        {enableHighAccuracy:false, timeout:12000, maximumAge:explicit ? 0 : 300000}));
+      if (request !== revision) { report("Using your manual selection."); return; }
+      const {longitude:x, latitude:y} = coords;
+      const moveMap = cells && (explicit || (!document.querySelector(".guideTarget") && !location.hash && !entry.size));
+      if (moveMap) selectCell(y, x, explicit);
+      const mapNote = moveMap ? "Selected the 2° temperature cell near you. " : "";
+      try {
+        if (!geography) {
+          const response = await fetch("map/country-outlines.json");
+          if (!response.ok) throw Error("Boundary data unavailable");
+          geography = await response.json();
+        }
+        if (request !== revision) { report("Using your manual selection."); return; }
+        const match = geography.find(([, [w,s,e,n], rings]) => x >= w && x <= e && y >= s && y <= n &&
+          insideRing(x,y,rings[0]) && !rings.slice(1).some(ring => insideRing(x,y,ring)));
+        if (!match || !Array.from(countrySelect.options).some(option => option.value === match[0])) {
+          report(mapNote + "No matching population country was found. Choose one in the population panel.");
+          return;
+        }
+        countrySelect.value = match[0];
+        countrySelect.dispatchEvent(new Event("change", {bubbles:true}));
+        // Switching a country overlay normally recentres on its most populated cell.
+        if (moveMap && selected.cell !== cellAt(y, x)) selectCell(y, x, false);
+        report(mapNote + "Population comparison: " + countrySelect.selectedOptions[0].textContent + " and the world.");
+      } catch {
+        report(mapNote + "Country boundaries are unavailable. Choose a country in the population panel.");
       }
-      const {longitude:x, latitude:y} = position.coords;
-      const match = geography.find(([, [w,s,e,n], rings]) => x >= w && x <= e && y >= s && y <= n &&
-        insideRing(x,y,rings[0]) && !rings.slice(1).some(ring => insideRing(x,y,ring)));
-      if (request !== revision) { status.textContent = "Using the country you selected."; return; }
-      if (!match) { status.textContent = "We couldn’t match this location to a country. Choose one above."; return; }
-      countrySelect.value = match[0];
-      countrySelect.dispatchEvent(new Event("change", {bubbles:true}));
-      nearbyCell = cellAt(y,x);
-      localCell.hidden = false;
-      status.textContent = "Showing " + countrySelect.selectedOptions[0].textContent + " alongside the world. You can choose another country.";
     } catch (error) {
-      status.textContent = error.code === 1 ? "Location access was declined. Choose a country above."
-        : "Location is unavailable. Choose a country above.";
-    } finally { button.disabled = false; }
+      report(error.code === 1 ? "Location access was declined. Choose a place manually."
+        : "Location is unavailable. Choose a place manually.");
+    } finally { button.disabled = mapButton.disabled = false; }
   }
-  button.addEventListener("click", locate);
+  button.onclick = mapButton.onclick = () => locate(true);
   const offerGrantedLocation = async () => {
     if (entry.has("country") || !navigator.permissions) return;
     const before = revision;
     try {
       const permission = await navigator.permissions.query({name:"geolocation"});
-      if (permission.state === "granted" && before === revision) locate();
+      if (permission.state === "granted" && before === revision) locate(false);
     } catch { /* Browsers without permission queries can still use the button. */ }
   };
-  if (countrySelect.options.length) offerGrantedLocation();
-  else document.addEventListener("population-ready", offerGrantedLocation, {once:true});
+  function enableLocation() {
+    button.disabled = mapButton.disabled = !cells;
+    if (cells && countrySelect.options.length) offerGrantedLocation();
+  }
+  if (document.body.dataset.explorerReady) enableLocation();
+  else document.addEventListener("explorer-ready", enableLocation, {once:true});
 })();
