@@ -46,7 +46,10 @@
 #exposureCaption, #population details p {color:var(--muted); margin-top:6px; font-size:14px}
 #population table {width:100%; min-width:540px; table-layout:fixed}
 #population th {white-space:normal; vertical-align:bottom; line-height:1.35}
-#population thead th:first-child {width:10%}
+#population thead th:first-child {width:18%}
+#population tbody th {overflow-wrap:anywhere}
+.populationCountry {display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:10px 0; font-weight:600}
+.populationCountry select {font:inherit; max-width:100%; padding:4px 8px}
 #population tr > :nth-child(2) {text-align:right}
 #population tbody td {font-variant-numeric:tabular-nums}
 #population details {margin-top:12px; max-width:85ch}

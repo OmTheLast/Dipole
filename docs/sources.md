@@ -30,7 +30,7 @@ Copy the **Link Text** and **Link URL** into the matching section of the submiss
 | Gravity Toolkit mission-month documentation | https://gravity-toolkit.readthedocs.io/en/stable/api_reference/time.html | Identifies shifted observation dates for the December 2011 and May 2015 nominal mission months. |
 | Natural Earth, 1:110m land polygons | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_110m_land.geojson | Public-domain coastline geometry used to orient visitors on the clickable world map. Retrieved 14 November 2026. |
 | European Commission, GHS-POP R2023A, 2020 residential population | https://human-settlement.emergency.copernicus.eu/ghs_pop2023.php | Counts of estimated residents at 30 arc-seconds, summed into Dipole’s 2° cells. Retrieved 14 November 2026. |
-| Natural Earth, 1:10m country boundaries v5.1.2 | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_10m_admin_0_countries.geojson | India’s mapped boundary selects population pixels by their centres, including in cross-border temperature cells. |
+| Natural Earth, 1:10m country boundaries v5.1.2 | https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_10m_admin_0_countries.geojson | Mapped country and territory boundaries assign population pixels by their centres, including in cross-border temperature cells. |
 | Rasterio | https://rasterio.readthedocs.io/ | Read the population raster and applied the country boundary on its native grid. |
 | Python | https://www.python.org/ | Ran the analysis and verification scripts. |
 | Unidata netCDF4 for Python | https://unidata.github.io/netcdf4-python/ | Read NASA’s monthly grid, dates and missing values. |

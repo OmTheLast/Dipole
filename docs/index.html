@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f7f6f0">
 <title>Dipole · Temperature explorer</title>
-<link rel="stylesheet" href="map/style.css?v=population-1">
-<script src="map/app.js?v=population-1" defer></script>
+<link rel="stylesheet" href="map/style.css?v=population-countries">
+<script src="map/app.js?v=population-countries" defer></script>
 </head>
 <body>
 <header><div class="brand"><span class="brandmark" aria-hidden="true"></span>Dipole</div><nav aria-label="Project"><a href="water/">Water storage</a><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources ↗</a><a href="https://github.com/OmTheLast/Dipole">GitHub ↗</a></nav></header>
@@ -45,14 +45,16 @@
 <section id="population" class="summary atlas" aria-labelledby="exposureHeading">
 <h2 id="exposureHeading">How many people lived in places warming faster than the world?</h2>
 <p id="exposureCaption">Loading 2020 population estimates…</p>
-<div id="exposureData" hidden><div class="scrolltable"><table>
+<div id="exposureData" hidden>
+<label class="populationCountry" for="exposureCountry">Country or territory <select id="exposureCountry"></select></label>
+<div class="scrolltable"><table>
 <thead><tr><th scope="col">Area</th><th scope="col">Residents in faster-warming cells</th><th scope="col">Share of covered residents</th><th scope="col">Residents with a trend</th><th scope="col">Residents without a trend</th></tr></thead>
 <tbody id="exposureRows"></tbody></table></div>
-<figure class="populationBar"><figcaption>India’s residents in cells with a temperature trend</figcaption>
-<div class="populationTrack" aria-hidden="true"><span id="indiaFasterBar"></span></div>
-<div class="populationLabels"><span id="indiaFasterLabel"></span><span id="indiaOtherLabel"></span></div></figure>
+<figure class="populationBar"><figcaption id="countryBarCaption"></figcaption>
+<div class="populationTrack" aria-hidden="true"><span id="countryFasterBar"></span></div>
+<div class="populationLabels"><span id="countryFasterLabel"></span><span id="countryOtherLabel"></span></div></figure>
 <details><summary>How the count and uncertainty work</summary>
-<p>We add the estimated 2020 residents of each 2° cell whose local warming rate exceeds the global rate. The percentage uses residents in cells with a complete trend. For India, we count only population pixels whose centres fall inside the mapped country boundary.</p>
+<p>We add the estimated 2020 residents of each 2° cell whose local warming rate exceeds the global rate. The percentage uses residents in cells with a complete trend. For each country or territory, we count residents whose population pixel centres fall inside its mapped boundary. World includes all population pixels.</p>
 <p id="exposureIntervals"></p><p>These cell-by-cell intervals can be too narrow for short records. The population counts describe where people lived in 2020. Health outcomes require separate data.</p>
 </details></div></section>
 <section class="summary atlas"><h2>Regional comparison</h2><p id="comparisonCaption"></p><div class="scrolltable"><table><thead><tr><th scope="col">Region</th><th scope="col" id="timeHeading">Years fitted</th><th scope="col">Local</th><th scope="col">Global</th><th scope="col">Local − global</th></tr></thead><tbody id="comparison"></tbody></table></div><p id="comparisonNote" class="note"></p></section>

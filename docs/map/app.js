@@ -483,10 +483,13 @@ const people = new Intl.NumberFormat("en-US", {notation: "compact", maximumFract
 function showExposure() {
   if (!population || !period) return;
   const groups = population.periods[firstYear];
+  const code = $("exposureCountry").value;
+  const name = population.countries[code];
+  const country = groups.countries[code];
   $("exposureCaption").textContent = "Estimated 2020 residents, classified by " + firstYear + "–" + period.end + " temperature trends.";
   $("exposureData").hidden = false;
   const rows = [];
-  for (const [label, counts] of [["India", groups.india], ["World", groups.world]]) {
+  for (const [label, counts] of [[name, country], ["World", groups.world]]) {
     const row = document.createElement("tr");
     const title = document.createElement("th");
     title.scope = "row";
@@ -501,12 +504,15 @@ function showExposure() {
     rows.push(row);
   }
   $("exposureRows").replaceChildren(...rows);
-  const share = 100 * groups.india.faster / groups.india.valid;
-  $("indiaFasterBar").style.width = share + "%";
-  $("indiaFasterLabel").textContent = share.toFixed(1) + "% faster than global";
-  $("indiaOtherLabel").textContent = (100 - share).toFixed(1) + "% at or below global";
+  $("countryBarCaption").textContent = "Residents in " + name + " with a temperature trend";
+  const share = country.valid ? 100 * country.faster / country.valid : null;
+  $("countryFasterBar").parentElement.hidden = share === null;
+  $("countryFasterBar").style.width = (share ?? 0) + "%";
+  $("countryFasterLabel").textContent = share === null ? "No residents have a complete trend for this period."
+    : share.toFixed(1) + "% faster than global";
+  $("countryOtherLabel").textContent = share === null ? "" : (100 - share).toFixed(1) + "% at or below global";
   $("exposureIntervals").textContent = "A stricter check counts only cells whose local-minus-global trend has a 95% interval entirely above zero. This includes " +
-    people.format(groups.india.aboveInterval) + " residents in India and " + people.format(groups.world.aboveInterval) +
+    people.format(country.aboveInterval) + " residents in " + name + " and " + people.format(groups.world.aboveInterval) +
     " worldwide. Each interval applies to one cell. The counts have no map-wide significance adjustment.";
 }
 
@@ -611,7 +617,12 @@ $("modes").addEventListener("click", event => {
 
 async function loadPopulation() {
   try {
-    population = await get("population-2020.json").then(r => r.json());
+    population = await get("population-2020.json?v=countries").then(r => r.json());
+    const selector = $("exposureCountry");
+    const entries = Object.entries(population.countries).sort((a, b) => a[1].localeCompare(b[1], "en"));
+    selector.replaceChildren(...entries.map(([code, name]) => new Option(name, code)));
+    selector.value = "IND";
+    selector.addEventListener("change", showExposure);
     showExposure();
     if (selected) show(selected, false);
   } catch {

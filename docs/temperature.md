@@ -85,7 +85,7 @@ gzip -dc raw/gistemp250.nc.gz > raw/gistemp250.nc
 
 The count sums the estimated 2020 residents in 2° cells whose fitted local-minus-global slope is positive. The denominator includes all residents in cells with a complete temperature trend for the selected period. A separate count uses only cells whose pointwise 95% lower bound exceeds zero. Short records can give overly narrow intervals. Counts are estimates of residential exposure to a regional trend.
 
-We add the GHS-POP 30 arc-second pixel counts by pixel centre, wrapping longitudes at the dateline. For India we apply the Natural Earth v5.1.2 country boundary at the population raster’s resolution before summing. Border counts depend on that boundary. The browser displays rounded results. The calculation uses unrounded population weights.
+We add the GHS-POP 30 arc-second pixel counts by pixel centre, wrapping longitudes at the dateline. For each country and territory we apply its Natural Earth v5.1.2 boundary at the population raster’s resolution before summing. Border counts depend on that boundary. The selector includes areas with at least one estimated resident after rounding. The world total is computed from the full raster independently of country boundaries. The browser displays rounded results. The calculation uses unrounded population weights.
 
 From the repository root, install the analysis requirements, then rebuild with the following commands.
 
