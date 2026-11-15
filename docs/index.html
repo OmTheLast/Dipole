@@ -8,16 +8,29 @@
 <title>Dipole · Same planet, opposite trends</title>
 <meta name="description" content="Explore how surface temperature changed at every place on Earth since 1900, using NASA’s GISTEMP record.">
 <link rel="preload" href="fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="map/style.css?v=design-2">
-<script src="map/app.js?v=design-2" defer></script>
+<link rel="stylesheet" href="map/style.css?v=feedback-1">
+<script src="map/app.js?v=feedback-1" defer></script>
+<script>matchMedia("(max-width: 640px)").matches && document.addEventListener("DOMContentLoaded", () => document.querySelector(".readmore").open = false);</script>
 </head>
 <body>
 <div class="deep">
-<header class="top"><a class="brand" href="./"><span class="brandmark" aria-hidden="true"></span>Dipole</a><nav aria-label="Project"><a href="./" aria-current="page">Temperature</a><a href="water/">Water</a><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources</a><a href="https://github.com/OmTheLast/Dipole">GitHub</a></nav></header>
+<header class="top"><a class="brand" href="./"><span class="brandmark" aria-hidden="true"></span>Dipole</a><nav aria-label="Project"><a href="./" aria-current="page">Temperature</a><a href="water/">Water</a><a class="widelink" href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources</a><a class="widelink" href="https://github.com/OmTheLast/Dipole">GitHub</a><details class="moremenu"><summary>More</summary><div><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources</a><a href="https://github.com/OmTheLast/Dipole">GitHub</a></div></details></nav></header>
 
 <section class="hero">
 <h1>Same planet,<br>opposite trends.</h1>
-<p class="lede">The world has warmed about 0.1 °C per decade since 1900. The Arctic has raced ahead. The sea south of Greenland has barely warmed at all. Choose a finding, or select any place on the map, to see how its temperature changed in NASA’s GISTEMP record.</p>
+<div class="herotext">
+<p class="lede">Dipole shows how the surface temperature of every part of the world has changed since 1900, using NASA’s GISTEMP record.</p>
+<details class="readmore" open><summary>Read more</summary>
+<div class="heromore">
+<h2>What we found</h2>
+<ul><li>The ocean south of Greenland barely warmed: +0.01 °C per decade since 1900, while the world warmed +0.10.</li>
+<li>Since 1980 the Arctic has warmed 3.3 times as fast as the world: +0.69 °C per decade against +0.21.</li></ul>
+<h2>Try this</h2>
+<ul><li>Choose By year, press Play and watch the Arctic turn orange.</li>
+<li>Click the ocean south of Greenland to see the warming hole.</li>
+<li>Type your city’s latitude and longitude under Explore a place.</li></ul>
+</div></details>
+</div>
 </section>
 
 <fieldset id="cases" class="cases" disabled><legend class="visually-hidden">Start with a finding</legend>
@@ -28,25 +41,26 @@
 <p id="story" class="story"></p>
 
 <div class="controls">
-<fieldset id="views" class="segmented" disabled><legend>View</legend><button data-view="trend" aria-pressed="true">Trend</button><button data-view="annual" aria-pressed="false">By year</button></fieldset>
 <fieldset id="periods" class="segmented" disabled><legend>Period</legend><button data-start="1900" aria-pressed="true">1900–2025</button><button data-start="1980" aria-pressed="false">1980–2025</button></fieldset>
-<fieldset id="modes" class="segmented" disabled><legend>Colour by</legend><button data-mode="absolute" aria-pressed="false">Local trend</button><button data-mode="relative" aria-pressed="true">Relative to global</button></fieldset>
+<div class="modegroup"><fieldset id="modes" class="segmented" disabled><legend>Colour by</legend><button data-mode="relative" aria-pressed="true">Relative to global</button><button data-mode="absolute" aria-pressed="false">Local trend</button></fieldset>
+<p id="modeHint" class="modehint">Blue: warmed more slowly than the world. Orange: warmed faster.</p></div>
+<fieldset id="views" class="segmented minor" disabled><legend>Show</legend><button data-view="trend" aria-pressed="true">Trend</button><button data-view="annual" aria-pressed="false">By year</button></fieldset>
 </div>
-<div id="scrubber" hidden><label for="year">Year <output id="yearValue" for="year">2015</output></label>
+<div id="scrubber" hidden><div class="scrubhead"><label for="year">Year <output id="yearValue" for="year">2015</output></label><button type="button" id="playYear" aria-pressed="false">Play</button></div>
 <div class="yeartrack"><span id="startLabel">1980</span><input id="year" type="range" min="1980" max="2025" step="1" value="2015"><span>2025</span></div></div>
 <p id="status" role="status">Loading NASA temperature estimates…</p>
 
 <div class="workspace">
 <section class="atlas" aria-label="Global temperature map">
+<div class="locations"><div class="presets" id="presets"><span class="presetlabel">Explore a place</span>
+<button data-region="Arctic">Arctic</button><button data-region="North Atlantic">North Atlantic</button><button data-lat="13.08" data-lon="80.27">Chennai</button></div>
+<form id="coords"><label>Latitude<input type="number" name="lat" required min="-90" max="90" step="any" placeholder="−90 to 90"></label><label>Longitude<input type="number" name="lon" required min="-180" max="180" step="any" placeholder="−180 to 180"></label><button type="submit">Show cell</button></form></div>
 <div class="maptools" role="group" aria-label="Map navigation">
 <button id="zoomOut" aria-label="Zoom out" disabled>−</button><output id="zoomLevel" aria-label="Map zoom">1×</output><button id="zoomIn" aria-label="Zoom in" disabled>+</button>
-<button id="worldView" disabled>Whole world</button><span id="mapHint">Select a cell for details. Zoom in to drag the map.</span>
+<button id="worldView" disabled>Whole world</button><button id="copyLink" type="button">Copy link</button><span id="mapHint">Select a cell, or use the arrow keys. Zoom in to drag.</span>
 </div>
 <div class="maparea"><canvas id="map" tabindex="0" aria-describedby="mapHint" aria-label="World temperature map"></canvas><div id="cellTip" hidden></div></div>
 <div class="legend"><div class="legendscale"><span class="legendtitle"><span id="legendText">Temperature trend</span> <span id="legendUnits">°C / decade</span></span><div class="scale"><div class="gradient"></div><div class="ticks"><span id="scaleLow">≤ −1</span><span>0</span><span id="scaleHigh">≥ +1</span></div></div></div><span class="missing"><i></i> <span id="missingLabel">Incomplete record</span></span><span id="overlayKey" class="overlaykey"><span class="hatchkey"><i></i> 250 km grid has data in fewer than half the months</span></span></div>
-<div class="locations"><div class="presets" id="presets"><span class="presetlabel">Jump to</span>
-<button data-region="Arctic">Arctic</button><button data-region="North Atlantic">North Atlantic</button><button data-lat="13.08" data-lon="80.27">Chennai</button></div>
-<form id="coords"><label>Latitude<input type="number" name="lat" required min="-90" max="90" step="any" placeholder="−90 to 90"></label><label>Longitude<input type="number" name="lon" required min="-180" max="180" step="any" placeholder="−180 to 180"></label><button type="submit">Show cell</button></form></div>
 </section>
 
 <section class="inspector" aria-label="Selected location">
@@ -62,6 +76,7 @@
 <div class="chapterhead"><h2 id="exposureHeading">Who lives where it is warming faster than the world?</h2>
 <p id="exposureCaption">Loading 2020 population estimates…</p></div>
 <div id="exposureData" hidden>
+<p class="bignumber"><span id="indiaShare">–</span> of people in India live in places that warmed faster than the world over <span id="indiaPeriod">1900–2025</span>.</p>
 <figure class="populationBar"><figcaption>India’s residents in cells with a temperature trend</figcaption>
 <div class="populationTrack" aria-hidden="true"><span id="indiaFasterBar"></span></div>
 <div class="populationLabels"><span id="indiaFasterLabel"></span><span id="indiaOtherLabel"></span></div></figure>
