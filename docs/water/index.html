@@ -1,10 +1,14 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#102a43"><link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <title>Northwest India water storage · Dipole</title>
-<link rel="stylesheet" href="../map/style.css?v=population-1"><link rel="stylesheet" href="water.css"><script type="module" src="water.js"></script></head>
-<body><header><div class="brand"><span class="brandmark" aria-hidden="true"></span>Dipole</div><nav><a href="../">Temperature explorer</a></nav></header>
-<main><section class="intro"><div><p class="eyebrow">Northwest India · GRACE and GRACE-FO</p>
-<h1>Water after the monsoon</h1><p>How much water did Rajasthan, Punjab, Haryana and Delhi store after each rainy season?</p></div></section>
+<link rel="preload" href="../fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="../map/style.css?v=design-1"><link rel="stylesheet" href="water.css?v=design-1"><script type="module" src="water.js"></script></head>
+<body>
+<div class="deep waterdeep">
+<header class="top"><a class="brand" href="../"><span class="brandmark" aria-hidden="true"></span>Dipole</a><nav aria-label="Project"><a href="../">Temperature</a><a href="./" aria-current="page">Water</a><a href="https://github.com/OmTheLast/Dipole/blob/main/docs/sources.md">Sources</a><a href="https://github.com/OmTheLast/Dipole">GitHub</a></nav></header>
+<section class="hero"><h1>Water after the monsoon.</h1>
+<p class="lede">NASA’s GRACE and GRACE-FO satellites sense tiny changes in Earth’s gravity as water moves. How much water did Rajasthan, Punjab, Haryana and Delhi store after each rainy season since 2002?</p></section>
+</div>
+<main class="shore watershore">
 <section class="atlas waterPanel"><h2>Regional water storage</h2>
 <p>Zero is the region’s average storage in 2004–2009. A value of −10 cm means the region held less water than that average, equivalent to a 10 cm layer spread across its area.</p>
 <p id="waterStatus" role="status">Loading NASA observations…</p>
