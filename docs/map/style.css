@@ -45,6 +45,7 @@ button, input, select { font: inherit }
 .deep > * { max-width: 1400px; margin-inline: auto }
 .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 72px }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 22px; letter-spacing: -.02em; text-decoration: none }
+.byline { margin: 2px 0 0 34px; font-size: 13px; line-height: 1.35; color: var(--haze) }
 .brandmark { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(90deg, var(--ice) 0 50%, var(--ember) 50% 100%); box-shadow: 0 0 0 3px #ffffff14 }
 .top nav { display: flex; gap: clamp(12px, 2.4vw, 28px); font-size: 14px }
 .top nav a { text-decoration: none; color: var(--haze); padding: 4px 0; border-bottom: 2px solid transparent }

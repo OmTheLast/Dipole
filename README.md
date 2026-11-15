@@ -1,5 +1,7 @@
 <h1 align="center">Dipole</h1>
 
+<p align="center">By Om Patnaik and <a href="https://github.com/vihaanvajpeyi">Vihaan Vajpeyi</a></p>
+
 <p align="center"><b>Use NASA temperature records to see how fast a place warmed compared with the world.</b></p>
 
 **[Open Dipole](https://ompatnaik.com/Dipole/)**, choose **By year**, and drag the slider to compare years. The explorer runs in your browser without an account or download.
@@ -21,4 +23,4 @@ Each frame shows one year. Red means warmer than that location’s 1951–1980 a
 - [Water storage methods](docs/water/method.md)
 - [Data sources and AI use](docs/sources.md)
 
-Built by Om Patnaik and [Vihaan Vajpeyi](https://github.com/vihaanvajpeyi) for the 2026 NASA Space Apps Challenge, [Be An Earth System Trend Detective!](https://www.spaceappschallenge.org/2026/challenges/earth-system-trend-detective/)
+Built for the 2026 NASA Space Apps Challenge, [Be An Earth System Trend Detective!](https://www.spaceappschallenge.org/2026/challenges/earth-system-trend-detective/)
