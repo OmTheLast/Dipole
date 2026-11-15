@@ -1,6 +1,6 @@
 <h1 align="center">Dipole</h1>
 
-<p align="center">By Om Patnaik and <a href="https://github.com/vihaanvajpeyi">Vihaan Vajpeyi</a></p>
+<p align="center"><sub>By Om Patnaik and <a href="https://github.com/vihaanvajpeyi">Vihaan Vajpeyi</a></sub></p>
 
 <p align="center"><b>Use NASA temperature records to see how fast a place warmed compared with the world.</b></p>
 
